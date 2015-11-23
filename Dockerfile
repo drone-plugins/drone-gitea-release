@@ -5,6 +5,6 @@
 #     docker build --rm=true -t plugins/drone-github-release .
 
 FROM alpine:3.2
-RUN apk add -U ca-certificates git && rm -rf /var/cache/apk/*
+RUN apk add -U ca-certificates && rm -rf /var/cache/apk/*
 ADD drone-github-release /bin/
 ENTRYPOINT ["/bin/drone-github-release"]
