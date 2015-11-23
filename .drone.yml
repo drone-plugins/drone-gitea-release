@@ -6,6 +6,7 @@ build:
     - GOARCH=amd64
     - CGO_ENABLED=0
   commands:
+    - go get
     - go build
     - go test
 
@@ -27,4 +28,3 @@ plugin:
     - publish
     - github
     - release
-    - dpl
