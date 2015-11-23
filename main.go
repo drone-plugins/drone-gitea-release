@@ -23,42 +23,40 @@ type Params struct {
 }
 
 func main() {
-	r := drone.Repo{}
-	b := drone.Build{}
-	w := drone.Workspace{}
-	v := Params{}
+	repo := drone.Repo{}
+	build := drone.Build{}
+	vargs := Params{}
 
-	plugin.Param("repo", &r)
-	plugin.Param("build", &b)
-	plugin.Param("workspace", &w)
-	plugin.Param("vargs", &v)
+	plugin.Param("repo", &repo)
+	plugin.Param("build", &build)
+	plugin.Param("vargs", &vargs)
 
 	plugin.MustParse()
 
-	if b.Event != "tag" {
+	if build.Event != "tag" {
 		fmt.Printf("The GitHub Release plugin is only available for tags\n")
 		os.Exit(0)
 
 		return
 	}
 
-	if len(v.BaseUrl) == 0 {
-		v.BaseUrl = "https://api.github.com/"
+	if len(vargs.BaseUrl) == 0 {
+		vargs.BaseUrl = "https://api.github.com/"
 	} else {
-		if !strings.HasSuffix(v.BaseUrl, "/") {
-			v.BaseUrl = v.BaseUrl + "/"
+		if !strings.HasSuffix(vargs.BaseUrl, "/") {
+			vargs.BaseUrl = vargs.BaseUrl + "/"
 		}
 	}
 
-	if len(v.UploadUrl) == 0 {
-		v.UploadUrl = "https://uploads.github.com/"
+	if len(vargs.UploadUrl) == 0 {
+		vargs.UploadUrl = "https://uploads.github.com/"
 	} else {
-		if !strings.HasSuffix(v.UploadUrl, "/") {
-			v.UploadUrl = v.UploadUrl + "/"
+		if !strings.HasSuffix(vargs.UploadUrl, "/") {
+			vargs.UploadUrl = vargs.UploadUrl + "/"
 		}
 	}
 
-	if len(v.APIKey) == 0 {
+	if len(vargs.APIKey) == 0 {
 		fmt.Printf("You must provide an API key\n")
 		os.Exit(1)
 
@@ -67,7 +65,7 @@ func main() {
 
 	files := make([]string, 0)
 
-	for _, glob := range v.Files {
+	for _, glob := range vargs.Files {
 		globed, err := filepath.Glob(glob)
 
 		if err != nil {
@@ -82,7 +80,7 @@ func main() {
 		}
 	}
 
-	baseUrl, err := url.Parse(v.BaseUrl)
+	baseUrl, err := url.Parse(vargs.BaseUrl)
 
 	if err != nil {
 		fmt.Printf("Failed to parse base URL\n")
@@ -91,7 +89,7 @@ func main() {
 		return
 	}
 
-	uploadUrl, err := url.Parse(v.UploadUrl)
+	uploadUrl, err := url.Parse(vargs.UploadUrl)
 
 	if err != nil {
 		fmt.Printf("Failed to parse upload URL\n")
@@ -102,7 +100,7 @@ func main() {
 
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{
-			AccessToken: v.APIKey,
+			AccessToken: vargs.APIKey,
 		})
 
 	tc := oauth2.NewClient(
@@ -115,9 +113,9 @@ func main() {
 
 	release, releaseErr := retrieveRelease(
 		client,
-		r.Owner,
-		r.Name,
-		filepath.Base(b.Ref))
+		repo.Owner,
+		repo.Name,
+		filepath.Base(build.Ref))
 
 	if releaseErr != nil {
 		fmt.Println(releaseErr)
@@ -128,8 +126,8 @@ func main() {
 
 	uploadErr := appendFiles(
 		client,
-		r.Owner,
-		r.Name,
+		repo.Owner,
+		repo.Name,
 		*release.ID,
 		files)
 
