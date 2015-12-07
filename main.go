@@ -23,6 +23,7 @@ type Params struct {
 }
 
 func main() {
+	workspace := drone.Workspace{}
 	repo := drone.Repo{}
 	build := drone.Build{}
 	vargs := Params{}
@@ -30,7 +31,7 @@ func main() {
 	plugin.Param("repo", &repo)
 	plugin.Param("build", &build)
 	plugin.Param("vargs", &vargs)
-
+	plugin.Param("workspace", &workspace)
 	plugin.MustParse()
 
 	if build.Event != "tag" {
@@ -38,6 +39,10 @@ func main() {
 		os.Exit(0)
 
 		return
+	}
+
+	if len(workspace.Path) != 0 {
+		os.Chdir(workspace.Path)
 	}
 
 	if len(vargs.BaseUrl) == 0 {
