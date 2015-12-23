@@ -15,23 +15,23 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type Params struct {
-	BaseUrl   string   `json:"base_url"`
-	UploadUrl string   `json:"upload_url"`
-	APIKey    string   `json:"api_key"`
-	Files     []string `json:"files"`
-}
+var (
+	build     string
+	buildDate string
+)
 
 func main() {
+	fmt.Printf("Drone GitHub Release Plugin built at %s\n", buildDate)
+
 	workspace := drone.Workspace{}
 	repo := drone.Repo{}
 	build := drone.Build{}
 	vargs := Params{}
 
+	plugin.Param("workspace", &workspace)
 	plugin.Param("repo", &repo)
 	plugin.Param("build", &build)
 	plugin.Param("vargs", &vargs)
-	plugin.Param("workspace", &workspace)
 	plugin.MustParse()
 
 	if build.Event != "tag" {
@@ -39,10 +39,6 @@ func main() {
 		os.Exit(0)
 
 		return
-	}
-
-	if len(workspace.Path) != 0 {
-		os.Chdir(workspace.Path)
 	}
 
 	if len(vargs.BaseUrl) == 0 {
@@ -66,6 +62,10 @@ func main() {
 		os.Exit(1)
 
 		return
+	}
+
+	if len(workspace.Path) != 0 {
+		os.Chdir(workspace.Path)
 	}
 
 	files := make([]string, 0)
@@ -116,7 +116,7 @@ func main() {
 	client.BaseURL = baseUrl
 	client.UploadURL = uploadUrl
 
-	release, releaseErr := retrieveRelease(
+	release, releaseErr := prepareRelease(
 		client,
 		repo.Owner,
 		repo.Name,
@@ -145,31 +145,24 @@ func main() {
 }
 
 func prepareRelease(client *github.Client, owner string, repo string, tag string) (*github.RepositoryRelease, error) {
-	var release *github.RepositoryRelease
-	var releaseErr error
-
-	release, releaseErr = retrieveRelease(
+	release, _ := retrieveRelease(
 		client,
 		owner,
 		repo,
 		tag)
-
-	if releaseErr != nil {
-		return nil, releaseErr
-	}
 
 	if release != nil {
 		return release, nil
 	}
 
-	release, releaseErr = createRelease(
+	release, err := createRelease(
 		client,
 		owner,
 		repo,
 		tag)
 
-	if releaseErr != nil {
-		return nil, releaseErr
+	if err != nil {
+		return nil, err
 	}
 
 	if release != nil {
