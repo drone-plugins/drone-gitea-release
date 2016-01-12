@@ -112,7 +112,7 @@ func buildRelease(client *github.Client, owner string, repo string, tag string) 
 		return release, nil
 	}
 
-	// if not release was found by that tag, create a new one
+	// if no release was found by that tag, create a new one
 	release, err = newRelease(client, owner, repo, tag)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to retrieve or create a release: %s", err)
