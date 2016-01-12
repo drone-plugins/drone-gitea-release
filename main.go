@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -116,13 +115,10 @@ func buildRelease(client *github.Client, owner string, repo string, tag string) 
 	// if not release was found by that tag, create a new one
 	release, err = newRelease(client, owner, repo, tag)
 	if err != nil {
-		return nil, err
-	}
-	if release != nil {
-		return release, nil
+		return nil, fmt.Errorf("Failed to retrieve or create a release: %s", err)
 	}
 
-	return nil, errors.New("Failed to retrieve or create a release")
+	return release, nil
 }
 
 func getRelease(client *github.Client, owner string, repo string, tag string) (*github.RepositoryRelease, error) {
