@@ -1,8 +1,9 @@
 package main
 
+// Params are the parameters that the GitHub Release plugin can parse.
 type Params struct {
-	BaseUrl   string   `json:"base_url"`
-	UploadUrl string   `json:"upload_url"`
+	BaseURL   string   `json:"base_url"`
+	UploadURL string   `json:"upload_url"`
 	APIKey    string   `json:"api_key"`
 	Files     []string `json:"files"`
 }
