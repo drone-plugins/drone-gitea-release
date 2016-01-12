@@ -37,221 +37,142 @@ func main() {
 	if build.Event != "tag" {
 		fmt.Printf("The GitHub Release plugin is only available for tags\n")
 		os.Exit(0)
-
-		return
 	}
 
-	if len(vargs.BaseUrl) == 0 {
-		vargs.BaseUrl = "https://api.github.com/"
-	} else {
-		if !strings.HasSuffix(vargs.BaseUrl, "/") {
-			vargs.BaseUrl = vargs.BaseUrl + "/"
-		}
+	if vargs.BaseURL == "" {
+		vargs.BaseURL = "https://api.github.com/"
+	} else if !strings.HasSuffix(vargs.BaseURL, "/") {
+		vargs.BaseURL = vargs.BaseURL + "/"
 	}
 
-	if len(vargs.UploadUrl) == 0 {
-		vargs.UploadUrl = "https://uploads.github.com/"
-	} else {
-		if !strings.HasSuffix(vargs.UploadUrl, "/") {
-			vargs.UploadUrl = vargs.UploadUrl + "/"
-		}
+	if vargs.UploadURL == "" {
+		vargs.UploadURL = "https://uploads.github.com/"
+	} else if !strings.HasSuffix(vargs.UploadURL, "/") {
+		vargs.UploadURL = vargs.UploadURL + "/"
 	}
 
-	if len(vargs.APIKey) == 0 {
+	if vargs.APIKey == "" {
 		fmt.Printf("You must provide an API key\n")
 		os.Exit(1)
-
-		return
 	}
 
-	if len(workspace.Path) != 0 {
+	if workspace.Path != "" {
 		os.Chdir(workspace.Path)
 	}
 
-	files := make([]string, 0)
-
+	var files []string
 	for _, glob := range vargs.Files {
 		globed, err := filepath.Glob(glob)
-
 		if err != nil {
 			fmt.Printf("Failed to glob %s\n", glob)
 			os.Exit(1)
-
-			return
 		}
-
 		if globed != nil {
 			files = append(files, globed...)
 		}
 	}
 
-	baseUrl, err := url.Parse(vargs.BaseUrl)
-
+	baseURL, err := url.Parse(vargs.BaseURL)
 	if err != nil {
 		fmt.Printf("Failed to parse base URL\n")
 		os.Exit(1)
-
-		return
 	}
 
-	uploadUrl, err := url.Parse(vargs.UploadUrl)
-
+	uploadURL, err := url.Parse(vargs.BaseURL)
 	if err != nil {
 		fmt.Printf("Failed to parse upload URL\n")
 		os.Exit(1)
-
-		return
 	}
 
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{
-			AccessToken: vargs.APIKey,
-		})
-
-	tc := oauth2.NewClient(
-		oauth2.NoContext,
-		ts)
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: vargs.APIKey})
+	tc := oauth2.NewClient(oauth2.NoContext, ts)
 
 	client := github.NewClient(tc)
-	client.BaseURL = baseUrl
-	client.UploadURL = uploadUrl
+	client.BaseURL = baseURL
+	client.UploadURL = uploadURL
 
-	release, releaseErr := prepareRelease(
-		client,
-		repo.Owner,
-		repo.Name,
-		filepath.Base(build.Ref))
-
-	if releaseErr != nil {
-		fmt.Println(releaseErr)
+	release, err := buildRelease(client, repo.Owner, repo.Name, filepath.Base(build.Ref))
+	if err != nil {
+		fmt.Println(err)
 		os.Exit(1)
-
-		return
 	}
 
-	uploadErr := appendFiles(
-		client,
-		repo.Owner,
-		repo.Name,
-		*release.ID,
-		files)
-
-	if uploadErr != nil {
-		fmt.Println(uploadErr)
+	if err := uploadFiles(client, repo.Owner, repo.Name, *release.ID, files); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
-
-		return
 	}
 }
 
-func prepareRelease(client *github.Client, owner string, repo string, tag string) (*github.RepositoryRelease, error) {
-	release, _ := retrieveRelease(
-		client,
-		owner,
-		repo,
-		tag)
+func buildRelease(client *github.Client, owner string, repo string, tag string) (*github.RepositoryRelease, error) {
 
-	if release != nil {
+	// first attempt to get a release by that tag
+	release, err := getRelease(client, owner, repo, tag)
+	if err != nil && release == nil {
+		fmt.Println(err)
+	} else if release != nil {
 		return release, nil
 	}
 
-	release, err := createRelease(
-		client,
-		owner,
-		repo,
-		tag)
-
+	// if not release was found by that tag, create a new one
+	release, err = newRelease(client, owner, repo, tag)
 	if err != nil {
 		return nil, err
 	}
-
 	if release != nil {
 		return release, nil
 	}
 
-	return nil, errors.New(
-		"Failed to retrieve or create a release")
+	return nil, errors.New("Failed to retrieve or create a release")
 }
 
-func retrieveRelease(client *github.Client, owner string, repo string, tag string) (*github.RepositoryRelease, error) {
-	release, _, err := client.Repositories.GetReleaseByTag(
-		owner,
-		repo,
-		tag)
-
+func getRelease(client *github.Client, owner string, repo string, tag string) (*github.RepositoryRelease, error) {
+	release, _, err := client.Repositories.GetReleaseByTag(owner, repo, tag)
 	if err != nil {
-		return nil, errors.New(
-			"Failed to retrieve release")
+		return nil, fmt.Errorf("Release %s not found", tag)
 	}
 
 	fmt.Printf("Successfully retrieved %s release\n", tag)
 	return release, nil
 }
 
-func createRelease(client *github.Client, owner string, repo string, tag string) (*github.RepositoryRelease, error) {
-	release, _, err := client.Repositories.CreateRelease(
-		owner,
-		repo,
-		&github.RepositoryRelease{TagName: github.String(tag)})
-
+func newRelease(client *github.Client, owner string, repo string, tag string) (*github.RepositoryRelease, error) {
+	rr := &github.RepositoryRelease{TagName: github.String(tag)}
+	release, _, err := client.Repositories.CreateRelease(owner, repo, rr)
 	if err != nil {
-		return nil, errors.New(
-			"Failed to create release")
+		return nil, fmt.Errorf("Failed to create release: %s", err)
 	}
 
 	fmt.Printf("Successfully created %s release\n", tag)
 	return release, nil
 }
 
-func appendFiles(client *github.Client, owner string, repo string, id int, files []string) error {
-	assets, _, err := client.Repositories.ListReleaseAssets(
-		owner,
-		repo,
-		id,
-		&github.ListOptions{})
-
+func uploadFiles(client *github.Client, owner string, repo string, id int, files []string) error {
+	assets, _, err := client.Repositories.ListReleaseAssets(owner, repo, id, &github.ListOptions{})
 	if err != nil {
-		return errors.New(
-			"Failed to fetch existing assets")
+		return fmt.Errorf("Failed to fetch existing assets: %s", err)
 	}
 
 	for _, file := range files {
 		handle, err := os.Open(file)
-
 		if err != nil {
-			return errors.New(
-				fmt.Sprintf("Failed to read %s artifact", file))
+			return fmt.Errorf("Failed to read %s artifact: %s", file, err)
 		}
 
 		for _, asset := range assets {
 			if *asset.Name == path.Base(file) {
-				_, deleteErr := client.Repositories.DeleteReleaseAsset(
-					owner,
-					repo,
-					*asset.ID)
-
-				if deleteErr != nil {
-					return errors.New(
-						fmt.Sprintf("Failed to delete %s artifact", file))
-				} else {
-					fmt.Printf("Successfully deleted old %s artifact\n", *asset.Name)
+				if _, err := client.Repositories.DeleteReleaseAsset(owner, repo, *asset.ID); err != nil {
+					return fmt.Errorf("Failed to delete %s artifact: %s", file, err)
 				}
+				fmt.Printf("Successfully deleted old %s artifact\n", *asset.Name)
 			}
 		}
 
-		_, _, uploadErr := client.Repositories.UploadReleaseAsset(
-			owner,
-			repo,
-			id,
-			&github.UploadOptions{Name: path.Base(file)},
-			handle)
-
-		if uploadErr != nil {
-			return errors.New(
-				fmt.Sprintf("Failed to upload %s artifact", file))
-		} else {
-			fmt.Printf("Successfully uploaded %s artifact\n", file)
+		uo := &github.UploadOptions{Name: path.Base(file)}
+		if _, _, err = client.Repositories.UploadReleaseAsset(owner, repo, id, uo, handle); err != nil {
+			return fmt.Errorf("Failed to upload %s artifact: %s", file, err)
 		}
+
+		fmt.Printf("Successfully uploaded %s artifact\n", file)
 	}
 
 	return nil
