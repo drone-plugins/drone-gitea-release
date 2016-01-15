@@ -31,6 +31,14 @@ Drone plugin for publishing GitHub releases
         "files": [
             "dist/*.txt",
             "dist/other-file"
+        ],
+        "checksum": [
+            "md5",
+            "sha1",
+            "sha256",
+            "sha512",
+            "adler32",
+            "crc32"
         ]
     }
 }
@@ -71,6 +79,14 @@ docker run -i plugins/drone-github-release <<EOF
         "files": [
             "dist/*.txt",
             "dist/other-file"
+        ],
+        "checksum": [
+            "md5",
+            "sha1",
+            "sha256",
+            "sha512",
+            "adler32",
+            "crc32"
         ]
     }
 }

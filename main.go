@@ -60,7 +60,7 @@ func main() {
 	}
 
 	var files []string
-	for _, glob := range vargs.Files {
+	for _, glob := range vargs.Files.Slice() {
 		globed, err := filepath.Glob(glob)
 		if err != nil {
 			fmt.Printf("Failed to glob %s\n", glob)
@@ -71,13 +71,22 @@ func main() {
 		}
 	}
 
+	if vargs.Checksum.Len() > 0 {
+		var err error
+		files, err = writeChecksums(files, vargs.Checksum.Slice())
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}
+
 	baseURL, err := url.Parse(vargs.BaseURL)
 	if err != nil {
 		fmt.Printf("Failed to parse base URL\n")
 		os.Exit(1)
 	}
 
-	uploadURL, err := url.Parse(vargs.BaseURL)
+	uploadURL, err := url.Parse(vargs.UploadURL)
 	if err != nil {
 		fmt.Printf("Failed to parse upload URL\n")
 		os.Exit(1)
@@ -172,4 +181,42 @@ func uploadFiles(client *github.Client, owner string, repo string, id int, files
 	}
 
 	return nil
+}
+
+func writeChecksums(files, methods []string) ([]string, error) {
+
+	checksums := make(map[string][]string)
+	for _, method := range methods {
+		for _, file := range files {
+			handle, err := os.Open(file)
+			if err != nil {
+				return nil, fmt.Errorf("Failed to read %s artifact: %s", file, err)
+			}
+
+			hash, err := checksum(handle, method)
+			if err != nil {
+				return nil, err
+			}
+
+			checksums[method] = append(checksums[method], hash, file)
+		}
+	}
+
+	for method, results := range checksums {
+		filename := method + "sum.txt"
+		f, err := os.Create(filename)
+		if err != nil {
+			return nil, err
+		}
+
+		for i := 0; i < len(results); i += 2 {
+			hash := results[i]
+			file := results[i+1]
+			if _, err := f.WriteString(fmt.Sprintf("%s  %s\n", hash, file)); err != nil {
+				return nil, err
+			}
+		}
+		files = append(files, filename)
+	}
+	return files, nil
 }
