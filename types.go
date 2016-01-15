@@ -6,4 +6,5 @@ type Params struct {
 	UploadURL string   `json:"upload_url"`
 	APIKey    string   `json:"api_key"`
 	Files     []string `json:"files"`
+	Checksums []string `json:"checksums"`
 }
