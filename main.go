@@ -71,9 +71,9 @@ func main() {
 		}
 	}
 
-	if len(vargs.Checksums) > 0 {
+	if vargs.Checksum.Len() > 0 {
 		var err error
-		files, err = writeChecksums(files, vargs.Checksums)
+		files, err = writeChecksums(files, vargs.Checksum.Slice())
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
