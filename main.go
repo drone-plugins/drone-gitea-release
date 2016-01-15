@@ -86,7 +86,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	uploadURL, err := url.Parse(vargs.BaseURL)
+	uploadURL, err := url.Parse(vargs.UploadURL)
 	if err != nil {
 		fmt.Printf("Failed to parse upload URL\n")
 		os.Exit(1)
@@ -197,10 +197,6 @@ func writeChecksums(files, methods []string) ([]string, error) {
 			if err != nil {
 				return nil, err
 			}
-
-			fmt.Println(file)
-			fmt.Println(method)
-			fmt.Println(hash)
 
 			checksums[method] = append(checksums[method], hash, file)
 		}
