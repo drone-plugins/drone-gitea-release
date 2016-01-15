@@ -24,4 +24,3 @@ _testmain.go
 *.prof
 
 drone-github-release
-secrets.yml

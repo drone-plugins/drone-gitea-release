@@ -7,10 +7,10 @@ build:
 
 publish:
   docker:
-    username: jackspirou
+    username: drone
     password: $$DOCKER_PASS
     email: $$DOCKER_EMAIL
-    repo: jackspirou/drone-github-release
+    repo: plugins/drone-github-release
     when:
       branch: master
 
@@ -18,7 +18,7 @@ plugin:
   name: GitHub Release
   desc: Publishs files and artifacts to GitHub Releases
   type: publish
-  image: jackspirou/drone-github-release
+  image: plugins/drone-github-release
   labels:
     - github
     - release
