@@ -13,8 +13,7 @@ Sample configuration:
 publish:
   github_release:
     api_key: my_github_api_key
-    files:
-      - dist/*
+    files: dist/*
     checksum: sha1
 ```
 
@@ -26,6 +25,7 @@ publish:
     api_key: my_github_api_key
     files:
       - dist/*
+      - bin/binary.exe
     checksum:
       - md5
       - sha1

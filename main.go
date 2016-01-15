@@ -60,7 +60,7 @@ func main() {
 	}
 
 	var files []string
-	for _, glob := range vargs.Files {
+	for _, glob := range vargs.Files.Slice() {
 		globed, err := filepath.Glob(glob)
 		if err != nil {
 			fmt.Printf("Failed to glob %s\n", glob)

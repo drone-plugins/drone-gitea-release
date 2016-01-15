@@ -7,6 +7,6 @@ type Params struct {
 	BaseURL   string            `json:"base_url"`
 	UploadURL string            `json:"upload_url"`
 	APIKey    string            `json:"api_key"`
-	Files     []string          `json:"files"`
+	Files     drone.StringSlice `json:"files"`
 	Checksum  drone.StringSlice `json:"checksum"`
 }
