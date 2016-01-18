@@ -1,22 +1,37 @@
 build:
   image: golang:1.5
+  environment:
+    - CGO_ENABLED=0
   commands:
     - make deps
+    - make vet
     - make build
     - make test
 
 publish:
+  coverage:
+    when:
+      branch: master
   docker:
-    username: drone
+    username: $$DOCKER_USER
     password: $$DOCKER_PASS
     email: $$DOCKER_EMAIL
     repo: plugins/drone-github-release
+    tag: latest
     when:
       branch: master
+  docker:
+    username: $$DOCKER_USER
+    password: $$DOCKER_PASS
+    email: $$DOCKER_EMAIL
+    repo: plugins/drone-github-release
+    tag: develop
+    when:
+      branch: develop
 
 plugin:
   name: GitHub Release
-  desc: Publishs files and artifacts to GitHub Releases
+  desc: Publish files and artifacts to GitHub Releases
   type: publish
   image: plugins/drone-github-release
   labels:
