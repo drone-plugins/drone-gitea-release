@@ -1,26 +1,45 @@
 # drone-github-release
 
 [![Build Status](http://beta.drone.io/api/badges/drone-plugins/drone-github-release/status.svg)](http://beta.drone.io/drone-plugins/drone-github-release)
+[![Coverage Status](https://aircover.co/badges/drone-plugins/drone-github-release/coverage.svg)](https://aircover.co/drone-plugins/drone-github-release)
 [![](https://badge.imagelayers.io/plugins/drone-github-release:latest.svg)](https://imagelayers.io/?images=plugins/drone-github-release:latest 'Get your own badge on imagelayers.io')
 
-Drone plugin for publishing GitHub releases
+Drone plugin to publish files and artifacts to GitHub Release
 
-## Usage
+## Binary
+
+Build the binary using `make`:
 
 ```
+make deps build
+```
+
+### Example
+
+```sh
 ./drone-github-release <<EOF
 {
     "repo": {
         "clone_url": "git://github.com/drone/drone",
-        "full_name": "drone/drone",
         "owner": "drone",
-        "name": "drone"
+        "name": "drone",
+        "full_name": "drone/drone"
+    },
+    "system": {
+        "link_url": "https://beta.drone.io"
     },
     "build": {
-        "event": "tag",
-        "branch": "refs/heads/v0.0.1",
-        "commit": "8f5d3b2ce38562bedb48b798328f5bb2e4077a2f",
-        "ref": "refs/heads/v0.0.1"
+        "number": 22,
+        "status": "success",
+        "started_at": 1421029603,
+        "finished_at": 1421029813,
+        "message": "Update the Readme",
+        "author": "johnsmith",
+        "author_email": "john.smith@gmail.com"
+        "event": "push",
+        "branch": "master",
+        "commit": "436b7a6e2abaddfd35740527353e78a227ddcb2c",
+        "ref": "refs/heads/master"
     },
     "workspace": {
         "root": "/drone/src",
@@ -33,12 +52,9 @@ Drone plugin for publishing GitHub releases
             "dist/other-file"
         ],
         "checksum": [
-            "md5",
             "sha1",
             "sha256",
-            "sha512",
-            "adler32",
-            "crc32"
+            "sha512"
         ]
     }
 }
@@ -47,10 +63,10 @@ EOF
 
 ## Docker
 
-Build the Docker container using `make`:
+Build the container using `make`:
 
 ```
-make deps build docker
+make deps docker
 ```
 
 ### Example
@@ -60,15 +76,25 @@ docker run -i plugins/drone-github-release <<EOF
 {
     "repo": {
         "clone_url": "git://github.com/drone/drone",
-        "full_name": "drone/drone",
         "owner": "drone",
-        "name": "drone"
+        "name": "drone",
+        "full_name": "drone/drone"
+    },
+    "system": {
+        "link_url": "https://beta.drone.io"
     },
     "build": {
-        "event": "tag",
-        "branch": "refs/heads/v0.0.1",
-        "commit": "8f5d3b2ce38562bedb48b798328f5bb2e4077a2f",
-        "ref": "refs/heads/v0.0.1"
+        "number": 22,
+        "status": "success",
+        "started_at": 1421029603,
+        "finished_at": 1421029813,
+        "message": "Update the Readme",
+        "author": "johnsmith",
+        "author_email": "john.smith@gmail.com"
+        "event": "push",
+        "branch": "master",
+        "commit": "436b7a6e2abaddfd35740527353e78a227ddcb2c",
+        "ref": "refs/heads/master"
     },
     "workspace": {
         "root": "/drone/src",
@@ -81,12 +107,9 @@ docker run -i plugins/drone-github-release <<EOF
             "dist/other-file"
         ],
         "checksum": [
-            "md5",
             "sha1",
             "sha256",
-            "sha512",
-            "adler32",
-            "crc32"
+            "sha512"
         ]
     }
 }
