@@ -37,6 +37,13 @@ func main() {
 		os.Exit(0)
 	}
 
+	if vargs.FileExists == "" {
+		vargs.FileExists = "overwrite"
+	}
+	if !fileExistsValues[vargs.FileExists] {
+		fmt.Printf("invalid value for file_exists: use [empty], overwrite, skip or fail")
+	}
+
 	if vargs.BaseURL == "" {
 		vargs.BaseURL = "https://api.github.com/"
 	} else if !strings.HasSuffix(vargs.BaseURL, "/") {
@@ -104,6 +111,7 @@ func main() {
 		Repo:   repo.Name,
 		Tag:    filepath.Base(build.Ref),
 		Draft:  vargs.Draft,
+		FileExists: vargs.FileExists,
 	}
 
 	release, err := rc.buildRelease()
@@ -118,13 +126,20 @@ func main() {
 	}
 }
 
+var fileExistsValues = map[string]bool{
+	"overwrite": true,
+	"fail":      true,
+	"skip":      true,
+}
+
 // Release holds ties the drone env data and github client together.
 type releaseClient struct {
 	*github.Client
-	Owner string
-	Repo  string
-	Tag   string
-	Draft bool
+	Owner      string
+	Repo       string
+	Tag        string
+	Draft      bool
+	FileExists string
 }
 
 func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
@@ -159,7 +174,7 @@ func (rc *releaseClient) getRelease() (*github.RepositoryRelease, error) {
 func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
 	rr := &github.RepositoryRelease{
 		TagName: github.String(rc.Tag),
-		Draft: &rc.Draft,
+		Draft:   &rc.Draft,
 	}
 	release, _, err := rc.Client.Repositories.CreateRelease(rc.Owner, rc.Repo, rr)
 	if err != nil {
@@ -176,7 +191,28 @@ func (rc *releaseClient) uploadFiles(id int, files []string) error {
 		return fmt.Errorf("Failed to fetch existing assets: %s", err)
 	}
 
+	var uploadFiles []string
+files:
 	for _, file := range files {
+		for _, asset := range assets {
+			if *asset.Name == path.Base(file) {
+				switch rc.FileExists {
+				case "overwrite":
+					// do nothing
+				case "fail":
+					return fmt.Errorf("Asset file %s already exists", path.Base(file))
+				case "skip":
+					fmt.Printf("Skipping pre-existing %s artifact\n", *asset.Name)
+					continue files
+				default:
+					return fmt.Errorf("Internal error, unkown file_exist value %s", rc.FileExists)
+				}
+			}
+		}
+		uploadFiles = append(uploadFiles, file)
+	}
+
+	for _, file := range uploadFiles {
 		handle, err := os.Open(file)
 		if err != nil {
 			return fmt.Errorf("Failed to read %s artifact: %s", file, err)
