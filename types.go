@@ -9,4 +9,5 @@ type Params struct {
 	APIKey    string            `json:"api_key"`
 	Files     drone.StringSlice `json:"files"`
 	Checksum  drone.StringSlice `json:"checksum"`
+	Draft     bool              `json:"draft"`
 }

@@ -103,6 +103,7 @@ func main() {
 		Owner:  repo.Owner,
 		Repo:   repo.Name,
 		Tag:    filepath.Base(build.Ref),
+		Draft:  vargs.Draft,
 	}
 
 	release, err := rc.buildRelease()
@@ -123,6 +124,7 @@ type releaseClient struct {
 	Owner string
 	Repo  string
 	Tag   string
+	Draft bool
 }
 
 func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
@@ -155,7 +157,10 @@ func (rc *releaseClient) getRelease() (*github.RepositoryRelease, error) {
 }
 
 func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
-	rr := &github.RepositoryRelease{TagName: github.String(rc.Tag)}
+	rr := &github.RepositoryRelease{
+		TagName: github.String(rc.Tag),
+		Draft: &rc.Draft,
+	}
 	release, _, err := rc.Client.Repositories.CreateRelease(rc.Owner, rc.Repo, rr)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create release: %s", err)
