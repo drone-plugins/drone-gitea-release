@@ -2,7 +2,6 @@
 
 EXECUTABLE ?= drone-github-release
 IMAGE ?= plugins/$(EXECUTABLE)
-CI_BUILD_NUMBER ?= 0
 
 LDFLAGS = -X "main.buildDate=$(shell date -u '+%Y-%m-%d %H:%M:%S %Z')"
 PACKAGES = $(shell go list ./... | grep -v /vendor/)
