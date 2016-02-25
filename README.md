@@ -4,7 +4,7 @@
 [![Coverage Status](https://aircover.co/badges/drone-plugins/drone-github-release/coverage.svg)](https://aircover.co/drone-plugins/drone-github-release)
 [![](https://badge.imagelayers.io/plugins/drone-github-release:latest.svg)](https://imagelayers.io/?images=plugins/drone-github-release:latest 'Get your own badge on imagelayers.io')
 
-Drone plugin to publish files and artifacts to GitHub Release
+Drone plugin to publish files and artifacts to GitHub Release. For the usage information and a listing of the available options please take a look at [the docs](DOCS.md).
 
 ## Binary
 
