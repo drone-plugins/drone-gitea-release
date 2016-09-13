@@ -108,7 +108,7 @@ func run(c *cli.Context) error {
 		},
 		Config: Config{
 			APIKey:     c.String("api-key"),
-			Files:      c.StringSlice("api-key"),
+			Files:      c.StringSlice("files"),
 			FileExists: c.String("file-exists"),
 			Checksum:   c.StringSlice("checksum"),
 			Draft:      c.Bool("draft"),
