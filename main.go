@@ -104,7 +104,7 @@ func run(c *cli.Context) error {
 			Event: c.String("build.event"),
 		},
 		Commit: Commit{
-			Ref: c.String("commit.sha"),
+			Ref: c.String("commit.ref"),
 		},
 		Config: Config{
 			APIKey:     c.String("api-key"),
