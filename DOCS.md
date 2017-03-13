@@ -11,6 +11,7 @@ The following parameters are used to configure the plugin:
 * **file_exists** - what to do if an file asset already exists, supported values: **overwrite** (default), **skip** and **fail**
 * **checksum** - checksum takes hash methods to include in your GitHub release for the files specified. Supported hash methods include md5, sha1, sha256, sha512, adler32, and crc32.
 * **draft** - create a draft release if set to true
+* **prerelease** - set the release as prerelease if set to true
 * **base_url** - GitHub base URL, only required for GHE
 * **upload_url** - GitHub upload URL, only required for GHE
 
