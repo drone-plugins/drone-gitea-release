@@ -30,6 +30,7 @@ type (
 		FileExists string
 		Checksum   []string
 		Draft      bool
+		Prerelease bool
 		BaseURL    string
 		UploadURL  string
 	}
@@ -117,6 +118,7 @@ func (p Plugin) Exec() error {
 		Repo:       p.Repo.Name,
 		Tag:        filepath.Base(p.Commit.Ref),
 		Draft:      p.Config.Draft,
+		Prerelease: p.Config.Prerelease,
 		FileExists: p.Config.FileExists,
 	}
 

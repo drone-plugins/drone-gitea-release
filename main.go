@@ -44,6 +44,11 @@ func main() {
 			Usage:  "create a draft release",
 			EnvVar: "PLUGIN_DRAFT,GITHUB_RELEASE_DRAFT",
 		},
+		cli.BoolFlag{
+			Name:   "prerelease",
+			Usage:  "set the release as prerelease",
+			EnvVar: "PLUGIN_PRERELEASE,GITHUB_RELEASE_PRERELEASE",
+		},
 		cli.StringFlag{
 			Name:   "base-url",
 			Value:  "https://api.github.com/",
@@ -112,6 +117,7 @@ func run(c *cli.Context) error {
 			FileExists: c.String("file-exists"),
 			Checksum:   c.StringSlice("checksum"),
 			Draft:      c.Bool("draft"),
+			Prerelease: c.Bool("prerelease"),
 			BaseURL:    c.String("base-url"),
 			UploadURL:  c.String("upload-url"),
 		},

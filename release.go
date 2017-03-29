@@ -15,6 +15,7 @@ type releaseClient struct {
 	Repo       string
 	Tag        string
 	Draft      bool
+	Prerelease bool
 	FileExists string
 }
 
@@ -51,8 +52,9 @@ func (rc *releaseClient) getRelease() (*github.RepositoryRelease, error) {
 
 func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
 	rr := &github.RepositoryRelease{
-		TagName: github.String(rc.Tag),
-		Draft:   &rc.Draft,
+		TagName:    github.String(rc.Tag),
+		Draft:      &rc.Draft,
+		Prerelease: &rc.Prerelease,
 	}
 
 	release, _, err := rc.Client.Repositories.CreateRelease(rc.Owner, rc.Repo, rr)
