@@ -20,7 +20,7 @@ go test
 
 ## Docker
 
-Build the docker image with the following commands:
+Build the Docker image with the following commands:
 
 ```
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo
@@ -28,7 +28,7 @@ docker build --rm=true -t plugins/github-release .
 ```
 
 Please note incorrectly building the image for the correct x64 linux and with
-GCO disabled will result in an error when running the Docker image:
+CGO disabled will result in an error when running the Docker image:
 
 ```
 docker: Error response from daemon: Container command
