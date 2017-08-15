@@ -116,7 +116,7 @@ func (p Plugin) Exec() error {
 		Client:     client,
 		Owner:      p.Repo.Owner,
 		Repo:       p.Repo.Name,
-		Tag:        filepath.Base(p.Commit.Ref),
+		Tag:        strings.TrimPrefix(p.Commit.Ref, "refs/tags/"),
 		Draft:      p.Config.Draft,
 		Prerelease: p.Config.Prerelease,
 		FileExists: p.Config.FileExists,
