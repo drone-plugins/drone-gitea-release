@@ -1,5 +1,6 @@
 workspace:
   base: /go
+  path: src/github.com/drone-plugins/drone-github-release
 
 pipeline:
   test:
@@ -11,19 +12,11 @@ pipeline:
       - go test -cover -coverprofile=coverage.out
       - go build -ldflags "-s -w -X main.build=$DRONE_BUILD_NUMBER" -a -tags netgo
 
-  latest:
-    image: docker
+  publish:
+    image: plugins/docker
     repo: plugins/github-release
     tags: [ "latest", "1.0", "1" ]
+    secrets: [docker_username, docker_password]
     when:
       branch: master
       event: push
-
-plugin:
-  name: GitHub Release
-  desc: Publish files and artifacts to GitHub Releases
-  type: publish
-  image: plugins/github-release
-  labels:
-    - github
-    - release
