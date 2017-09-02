@@ -24,5 +24,6 @@ _testmain.go
 *.prof
 .env
 
+release/*
 coverage.out
 drone-github-release

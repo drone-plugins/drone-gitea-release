@@ -16,7 +16,7 @@ func main() {
 	app.Name = "github-release plugin"
 	app.Usage = "github-release plugin"
 	app.Action = run
-	app.Version = fmt.Sprintf("1.0.%s", build)
+	app.Version = fmt.Sprintf("1.0.0+%s", build)
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "api-key",

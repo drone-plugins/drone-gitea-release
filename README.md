@@ -1,13 +1,12 @@
 # drone-github-release
 
 [![Build Status](http://beta.drone.io/api/badges/drone-plugins/drone-github-release/status.svg)](http://beta.drone.io/drone-plugins/drone-github-release)
+[![Join the chat at https://gitter.im/drone/drone](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/drone/drone)
 [![Go Doc](https://godoc.org/github.com/drone-plugins/drone-github-release?status.svg)](http://godoc.org/github.com/drone-plugins/drone-github-release)
 [![Go Report](https://goreportcard.com/badge/github.com/drone-plugins/drone-github-release)](https://goreportcard.com/report/github.com/drone-plugins/drone-github-release)
-[![Join the chat at https://gitter.im/drone/drone](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/drone/drone)
+[![](https://images.microbadger.com/badges/image/plugins/github-release.svg)](https://microbadger.com/images/plugins/github-release "Get your own image badge on microbadger.com")
 
-Drone plugin to publish files and artifacts to GitHub Release. For the usage
-information and a listing of the available options please take a look at
-[the docs](DOCS.md).
+Drone plugin to publish files and artifacts to GitHub Release. For the usage information and a listing of the available options please take a look at [the docs](http://plugins.drone.io/drone-plugins/drone-github-release/).
 
 ## Build
 
@@ -15,7 +14,6 @@ Build the binary with the following commands:
 
 ```
 go build
-go test
 ```
 
 ## Docker
@@ -23,16 +21,8 @@ go test
 Build the Docker image with the following commands:
 
 ```
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo
-docker build --rm=true -t plugins/github-release .
-```
-
-Please note incorrectly building the image for the correct x64 linux and with
-CGO disabled will result in an error when running the Docker image:
-
-```
-docker: Error response from daemon: Container command
-'/bin/drone-github-release' not found or does not exist..
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -tags netgo -o release/linux/amd64/drone-github-release
+docker build --rm -t plugins/github-release .
 ```
 
 ## Usage
