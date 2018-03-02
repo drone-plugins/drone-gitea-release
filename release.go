@@ -8,7 +8,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 )
 
-// Release holds ties the drone env data and github client together.
+// Release holds ties the drone env data and gitea client together.
 type releaseClient struct {
 	*gitea.Client
 	Owner      string

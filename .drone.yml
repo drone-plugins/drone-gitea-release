@@ -54,3 +54,46 @@ pipeline:
   #     - CGO_ENABLED=0
   #   commands:
   #     - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/windows/amd64/drone-gitea-release
+
+  publish_linux_amd64:
+    image: plugins/docker:17.05
+    pull: true
+    repo: jonasfranz/gitea-release
+    tags: [ latest, 1.0.0, 1.0, 1 ]
+    secrets: [ docker_username, docker_password ]
+    when:
+      branch: master
+      event: push
+
+  publish_linux_arm64:
+    image: plugins/docker:17.05
+    pull: true
+    repo: jonasfranz/gitea-release
+    tags: [ linux-arm64 ]
+    secrets: [ docker_username, docker_password ]
+    dockerfile: Dockerfile.arm64
+    when:
+      branch: master
+      event: push
+
+  publish_linux_arm:
+    image: plugins/docker:17.05
+    pull: true
+    repo: jonasfranz/gitea-release
+    tags: [ linux-arm ]
+    secrets: [ docker_username, docker_password ]
+    dockerfile: Dockerfile.arm
+    when:
+      branch: master
+      event: push
+
+  # publish_windows_amd64:
+  #   image: plugins/docker:17.05
+  #   pull: true
+  #   repo: plugins/github-release
+  #   tags: [ windows-amd64 ]
+  #   secrets: [ docker_username, docker_password ]
+  #   dockerfile: Dockerfile.windows
+  #   when:
+  #     branch: master
+  #     event: push
