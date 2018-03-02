@@ -1,6 +1,6 @@
 workspace:
   base: /go
-  path: src/github.com/drone-plugins/drone-github-release
+  path: src/github.com/JonasFranzDEV/drone-gitea-release
 
 pipeline:
   test:
@@ -19,7 +19,7 @@ pipeline:
       - GOARCH=amd64
       - CGO_ENABLED=0
     commands:
-      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-github-release
+      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-gitea-release
 
   build_linux_arm64:
     image: golang:1.9
@@ -30,7 +30,7 @@ pipeline:
       - GOARCH=arm64
       - CGO_ENABLED=0
     commands:
-      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-github-release
+      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-gitea-release
 
   build_linux_arm:
     image: golang:1.9
@@ -42,7 +42,7 @@ pipeline:
       - CGO_ENABLED=0
       - GOARM=7
     commands:
-      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-github-release
+      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-gitea-release
 
   # build_windows_amd64:
   #   image: golang:1.9-nanoserver
@@ -53,56 +53,4 @@ pipeline:
   #     - GOARCH=amd64
   #     - CGO_ENABLED=0
   #   commands:
-  #     - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/windows/amd64/drone-github-release
-
-  publish_linux_amd64:
-    image: plugins/docker:17.05
-    pull: true
-    repo: plugins/github-release
-    tags: [ latest, 1.0.0, 1.0, 1 ]
-    secrets: [ docker_username, docker_password ]
-    when:
-      branch: master
-      event: push
-
-  publish_linux_arm64:
-    image: plugins/docker:17.05
-    pull: true
-    repo: plugins/github-release
-    tags: [ linux-arm64 ]
-    secrets: [ docker_username, docker_password ]
-    dockerfile: Dockerfile.arm64
-    when:
-      branch: master
-      event: push
-
-  publish_linux_arm:
-    image: plugins/docker:17.05
-    pull: true
-    repo: plugins/github-release
-    tags: [ linux-arm ]
-    secrets: [ docker_username, docker_password ]
-    dockerfile: Dockerfile.arm
-    when:
-      branch: master
-      event: push
-
-  # publish_windows_amd64:
-  #   image: plugins/docker:17.05
-  #   pull: true
-  #   repo: plugins/github-release
-  #   tags: [ windows-amd64 ]
-  #   secrets: [ docker_username, docker_password ]
-  #   dockerfile: Dockerfile.windows
-  #   when:
-  #     branch: master
-  #     event: push
-
-  microbadger:
-    image: plugins/webhook:1
-    pull: true
-    secrets: [ webhook_url ]
-    when:
-      branch: master
-      event: push
-      status: [ success ]
+  #     - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/windows/amd64/drone-gitea-release
