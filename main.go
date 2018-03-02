@@ -13,55 +13,47 @@ var build = "0" // build number set at compile-time
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "github-release plugin"
-	app.Usage = "github-release plugin"
+	app.Name = "gitea-release plugin"
+	app.Usage = "gitea-release plugin"
 	app.Action = run
 	app.Version = fmt.Sprintf("1.0.0+%s", build)
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "api-key",
-			Usage:  "api key to access github api",
-			EnvVar: "PLUGIN_API_KEY,GITHUB_RELEASE_API_KEY,GITHUB_TOKEN",
+			Usage:  "api key to access gitea api",
+			EnvVar: "PLUGIN_API_KEY,GITEA_RELEASE_API_KEY,GITEA_TOKEN",
 		},
 		cli.StringSliceFlag{
 			Name:   "files",
 			Usage:  "list of files to upload",
-			EnvVar: "PLUGIN_FILES,GITHUB_RELEASE_FILES",
+			EnvVar: "PLUGIN_FILES,GITEA_RELEASE_FILES",
 		},
 		cli.StringFlag{
 			Name:   "file-exists",
 			Value:  "overwrite",
 			Usage:  "what to do if file already exist",
-			EnvVar: "PLUGIN_FILE_EXISTS,GITHUB_RELEASE_FILE_EXISTS",
+			EnvVar: "PLUGIN_FILE_EXISTS,GITEA_RELEASE_FILE_EXISTS",
 		},
 		cli.StringSliceFlag{
 			Name:   "checksum",
 			Usage:  "generate specific checksums",
-			EnvVar: "PLUGIN_CHECKSUM,GITHUB_RELEASE_CHECKSUM",
+			EnvVar: "PLUGIN_CHECKSUM,GITEA_RELEASE_CHECKSUM",
 		},
 		cli.BoolFlag{
 			Name:   "draft",
 			Usage:  "create a draft release",
-			EnvVar: "PLUGIN_DRAFT,GITHUB_RELEASE_DRAFT",
+			EnvVar: "PLUGIN_DRAFT,GITEA_RELEASE_DRAFT",
 		},
 		cli.BoolFlag{
 			Name:   "prerelease",
 			Usage:  "set the release as prerelease",
-			EnvVar: "PLUGIN_PRERELEASE,GITHUB_RELEASE_PRERELEASE",
+			EnvVar: "PLUGIN_PRERELEASE,GITEA_RELEASE_PRERELEASE",
 		},
 		cli.StringFlag{
 			Name:   "base-url",
-			Value:  "https://api.github.com/",
-			Usage:  "api url, needs to be changed for ghe",
-			EnvVar: "PLUGIN_BASE_URL,GITHUB_RELEASE_BASE_URL",
+			Usage:  "url of the gitea instance",
+			EnvVar: "PLUGIN_BASE_URL,GITEA_RELEASE_BASE_URL",
 		},
-		cli.StringFlag{
-			Name:   "upload-url",
-			Value:  "https://uploads.github.com/",
-			Usage:  "upload url, needs to be changed for ghe",
-			EnvVar: "PLUGIN_UPLOAD_URL,GITHUB_RELEASE_UPLOAD_URL",
-		},
-
 		cli.StringFlag{
 			Name:   "repo.owner",
 			Usage:  "repository owner",
@@ -119,7 +111,6 @@ func run(c *cli.Context) error {
 			Draft:      c.Bool("draft"),
 			Prerelease: c.Bool("prerelease"),
 			BaseURL:    c.String("base-url"),
-			UploadURL:  c.String("upload-url"),
 		},
 	}
 

@@ -26,4 +26,4 @@ _testmain.go
 
 release/*
 coverage.out
-drone-github-release
+drone-gitea-release

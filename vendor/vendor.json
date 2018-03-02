@@ -3,28 +3,16 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "PWaIU7g1YSkETxka2DIS1EYsPK0=",
+			"path": "code.gitea.io/sdk/gitea",
+			"revision": "154cff2ee653febf91c926b54a8ec2ffa14f7ba0",
+			"revisionTime": "2018-03-02T10:57:23Z"
+		},
+		{
 			"checksumSHA1": "vwpCebe1/Uw4IVvhoCEzrsBoA+E=",
 			"path": "github.com/Sirupsen/logrus",
 			"revision": "418b41d23a1bf978c06faea5313ba194650ac088",
 			"revisionTime": "2015-09-08T20:46:18Z"
-		},
-		{
-			"checksumSHA1": "Ph3AzJaMHZxUdyqWL+Lx3CufxRw=",
-			"path": "github.com/golang/protobuf/proto",
-			"revision": "552c7b9542c194800fd493123b3798ef0a832032",
-			"revisionTime": "2016-02-26T01:45:00Z"
-		},
-		{
-			"checksumSHA1": "Kv5AVazFnOS2wxRhOUG2LJvz+rA=",
-			"path": "github.com/google/go-github/github",
-			"revision": "47f2593dad1971eec2f0a0971aa007fef5edbc50",
-			"revisionTime": "2015-11-20T21:11:25Z"
-		},
-		{
-			"checksumSHA1": "Evpv9y6iPdy+8FeAVDmKrqV1sqo=",
-			"path": "github.com/google/go-querystring/query",
-			"revision": "2a60fc2ba6c19de80291203597d752e9ba58e4c0",
-			"revisionTime": "2015-10-28T18:53:53Z"
 		},
 		{
 			"checksumSHA1": "ljZrmD7pmMXAkGNfp6IEzj31fY8=",
@@ -37,66 +25,6 @@
 			"path": "github.com/urfave/cli",
 			"revision": "05fe449c81eb7305a34e9253c321c960a1c5e057",
 			"revisionTime": "2016-08-23T15:25:51Z"
-		},
-		{
-			"checksumSHA1": "9jjO5GjLa0XF/nfWihF02RoH4qc=",
-			"path": "golang.org/x/net/context",
-			"revision": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf",
-			"revisionTime": "2016-08-11T10:50:59Z"
-		},
-		{
-			"checksumSHA1": "yNdgWHw0jfiNAO9E7IfrbyiuKVc=",
-			"path": "golang.org/x/oauth2",
-			"revision": "3b966c7f301c0c71c53d94dc632a62df0a682cd7",
-			"revisionTime": "2016-07-25T20:29:55Z"
-		},
-		{
-			"checksumSHA1": "D3v/aqfB9swlaZcSksCoF+lbOqo=",
-			"path": "golang.org/x/oauth2/internal",
-			"revision": "3b966c7f301c0c71c53d94dc632a62df0a682cd7",
-			"revisionTime": "2016-07-25T20:29:55Z"
-		},
-		{
-			"checksumSHA1": "vkIkV0+9xGOpe8Wb2wIkEIMm+qw=",
-			"path": "google.golang.org/appengine/internal",
-			"revision": "d1a42f52ede0dee193ca4bef13a979eaa9578649",
-			"revisionTime": "2015-11-19T04:43:11Z"
-		},
-		{
-			"checksumSHA1": "TsNO8P0xUlLNyh3Ic/tzSp/fDWM=",
-			"path": "google.golang.org/appengine/internal/base",
-			"revision": "d1a42f52ede0dee193ca4bef13a979eaa9578649",
-			"revisionTime": "2015-11-19T04:43:11Z"
-		},
-		{
-			"checksumSHA1": "5QsV5oLGSfKZqTCVXP6NRz5T4Tw=",
-			"path": "google.golang.org/appengine/internal/datastore",
-			"revision": "d1a42f52ede0dee193ca4bef13a979eaa9578649",
-			"revisionTime": "2015-11-19T04:43:11Z"
-		},
-		{
-			"checksumSHA1": "Gep2T9zmVYV8qZfK2gu3zrmG6QE=",
-			"path": "google.golang.org/appengine/internal/log",
-			"revision": "d1a42f52ede0dee193ca4bef13a979eaa9578649",
-			"revisionTime": "2015-11-19T04:43:11Z"
-		},
-		{
-			"checksumSHA1": "a1XY7rz3BieOVqVI2Et6rKiwQCk=",
-			"path": "google.golang.org/appengine/internal/remote_api",
-			"revision": "d1a42f52ede0dee193ca4bef13a979eaa9578649",
-			"revisionTime": "2015-11-19T04:43:11Z"
-		},
-		{
-			"checksumSHA1": "QtAbHtHmDzcf6vOV9eqlCpKgjiw=",
-			"path": "google.golang.org/appengine/internal/urlfetch",
-			"revision": "d1a42f52ede0dee193ca4bef13a979eaa9578649",
-			"revisionTime": "2015-11-19T04:43:11Z"
-		},
-		{
-			"checksumSHA1": "akOV9pYnCbcPA8wJUutSQVibdyg=",
-			"path": "google.golang.org/appengine/urlfetch",
-			"revision": "d1a42f52ede0dee193ca4bef13a979eaa9578649",
-			"revisionTime": "2015-11-19T04:43:11Z"
 		}
 	],
 	"rootPath": "github.com/JonasFranzDEV/drone-gitea-release"

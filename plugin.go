@@ -2,12 +2,10 @@ package main
 
 import (
 	"fmt"
-	"net/url"
 	"path/filepath"
 	"strings"
 
-	"github.com/google/go-github/github"
-	"golang.org/x/oauth2"
+	"code.gitea.io/sdk/gitea"
 )
 
 type (
@@ -32,7 +30,6 @@ type (
 		Draft      bool
 		Prerelease bool
 		BaseURL    string
-		UploadURL  string
 	}
 
 	Plugin struct {
@@ -49,7 +46,7 @@ func (p Plugin) Exec() error {
 	)
 
 	if p.Build.Event != "tag" {
-		return fmt.Errorf("The GitHub Release plugin is only available for tags")
+		return fmt.Errorf("The Gitea Release plugin is only available for tags")
 	}
 
 	if p.Config.APIKey == "" {
@@ -60,12 +57,12 @@ func (p Plugin) Exec() error {
 		return fmt.Errorf("Invalid value for file_exists")
 	}
 
-	if !strings.HasSuffix(p.Config.BaseURL, "/") {
-		p.Config.BaseURL = p.Config.BaseURL + "/"
+	if p.Config.BaseURL == "" {
+		return fmt.Errorf("You must provide a base url.")
 	}
 
-	if !strings.HasSuffix(p.Config.UploadURL, "/") {
-		p.Config.UploadURL = p.Config.UploadURL + "/"
+	if !strings.HasSuffix(p.Config.BaseURL, "/") {
+		p.Config.BaseURL = p.Config.BaseURL + "/"
 	}
 
 	for _, glob := range p.Config.Files {
@@ -92,25 +89,7 @@ func (p Plugin) Exec() error {
 		}
 	}
 
-	baseURL, err := url.Parse(p.Config.BaseURL)
-
-	if err != nil {
-		return fmt.Errorf("Failed to parse base URL. %s", err)
-	}
-
-	uploadURL, err := url.Parse(p.Config.UploadURL)
-
-	if err != nil {
-		return fmt.Errorf("Failed to parse upload URL. %s", err)
-	}
-
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: p.Config.APIKey})
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
-
-	client := github.NewClient(tc)
-
-	client.BaseURL = baseURL
-	client.UploadURL = uploadURL
+	client := gitea.NewClient(p.Config.BaseURL, p.Config.APIKey)
 
 	rc := releaseClient{
 		Client:     client,
@@ -128,7 +107,7 @@ func (p Plugin) Exec() error {
 		return fmt.Errorf("Failed to create the release. %s", err)
 	}
 
-	if err := rc.uploadFiles(*release.ID, files); err != nil {
+	if err := rc.uploadFiles(release.ID, files); err != nil {
 		return fmt.Errorf("Failed to upload the files. %s", err)
 	}
 
