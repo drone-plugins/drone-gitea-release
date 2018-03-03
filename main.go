@@ -55,6 +55,18 @@ func main() {
 			EnvVar: "PLUGIN_BASE_URL,GITEA_RELEASE_BASE_URL",
 		},
 		cli.StringFlag{
+			Name:   "note",
+			Value:  "",
+			Usage:  "file or string with notes for the release (example: changelog)",
+			EnvVar: "PLUGIN_NOTE,GITEA_RELEASE_NOTE",
+		},
+		cli.StringFlag{
+			Name:   "title",
+			Value:  "",
+			Usage:  "file or string for the title shown in the gitea release",
+			EnvVar: "PLUGIN_TITLE,GITEA_RELEASE_TITLE",
+		},
+		cli.StringFlag{
 			Name:   "repo.owner",
 			Usage:  "repository owner",
 			EnvVar: "DRONE_REPO_OWNER",
@@ -109,8 +121,10 @@ func run(c *cli.Context) error {
 			FileExists: c.String("file-exists"),
 			Checksum:   c.StringSlice("checksum"),
 			Draft:      c.Bool("draft"),
-			Prerelease: c.Bool("prerelease"),
+			PreRelease: c.Bool("prerelease"),
 			BaseURL:    c.String("base-url"),
+			Title:      c.String("title"),
+			Note:       c.String("note"),
 		},
 	}
 

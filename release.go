@@ -17,6 +17,8 @@ type releaseClient struct {
 	Draft      bool
 	Prerelease bool
 	FileExists string
+	Title      string
+	Note       string
 }
 
 func (rc *releaseClient) buildRelease() (*gitea.Release, error) {
@@ -56,9 +58,11 @@ func (rc *releaseClient) getRelease() (*gitea.Release, error) {
 
 func (rc *releaseClient) newRelease() (*gitea.Release, error) {
 	r := gitea.CreateReleaseOption{
-		TagName:    rc.Tag,
+		TagName:      rc.Tag,
 		IsDraft:      rc.Draft,
 		IsPrerelease: rc.Prerelease,
+		Title:        rc.Title,
+		Note:         rc.Note,
 	}
 
 	release, err := rc.Client.CreateRelease(rc.Owner, rc.Repo, r)
