@@ -27,5 +27,5 @@
 			"revisionTime": "2016-08-23T15:25:51Z"
 		}
 	],
-	"rootPath": "github.com/JonasFranzDEV/drone-gitea-release"
+	"rootPath": "github.com/drone-plugins/drone-gitea-release"
 }
