@@ -1,11 +1,12 @@
-FROM microsoft/nanoserver:latest
-MAINTAINER Drone.IO Community <drone-dev@googlegroups.com>
+# escape=`
+FROM microsoft/nanoserver:10.0.14393.1593
 
-LABEL org.label-schema.version=latest
-LABEL org.label-schema.vcs-url="https://github.com/drone-plugins/drone-gitea-release.git"
-LABEL org.label-schema.name="Drone Gitea Release"
-LABEL org.label-schema.vendor="Drone.IO Community"
-LABEL org.label-schema.schema-version="1.0"
+LABEL maintainer="Drone.IO Community <drone-dev@googlegroups.com>" `
+  org.label-schema.name="Drone Gitea Release" `
+  org.label-schema.vendor="Drone.IO Community" `
+  org.label-schema.schema-version="1.0"
 
-ADD release/windows/amd64/drone-gitea-release /bin/
-ENTRYPOINT [ "/bin/drone-gitea-release" ]
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+ADD release\drone-gitea-release.exe c:\drone-gitea-release.exe
+ENTRYPOINT [ "c:\\drone-gitea-release.exe" ]
