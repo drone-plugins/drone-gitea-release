@@ -1,0 +1,68 @@
+version: '{build}'
+image: 'Visual Studio 2017'
+platform: 'x64'
+
+clone_folder: 'c:\gopath\src\github.com\drone-plugins\drone-gitea-release'
+max_jobs: 1
+
+environment:
+  GOPATH: c:\gopath
+  DOCKER_USERNAME:
+    secure: '4YzzahbEiMZQJpOCOd1LAw=='
+  DOCKER_PASSWORD:
+    secure: 'VqO/G3Zfslu6zSLdwHKO+Q=='
+
+install:
+  - ps: |
+      docker version
+      go version
+  - ps: |
+      $env:Path = "c:\gopath\bin;$env:Path"
+
+build_script:
+  - ps: |
+      go get -u github.com/golang/dep/cmd/dep
+      dep ensure
+
+      if ( $env:APPVEYOR_REPO_TAG -eq 'false' ) {
+        go build -ldflags "-X main.build=$env:APPVEYOR_BUILD_VERSION" -a -o release/drone-gitea-release.exe
+      } else {
+        $version = $env:APPVEYOR_REPO_TAG_NAME.substring(1)
+        go build -ldflags "-X main.version=$version -X main.build=$env:APPVEYOR_BUILD_VERSION" -a -o release/drone-gitea-release.exe
+      }
+
+      docker pull microsoft/nanoserver:10.0.14393.1593
+      docker build -f Dockerfile.windows -t plugins/gitea-release:windows-amd64 .
+
+test_script:
+  - ps: |
+      docker run --rm plugins/gitea-release:windows-amd64 --version
+
+deploy_script:
+  - ps: |
+      $ErrorActionPreference = 'Stop';
+
+      if ( $env:APPVEYOR_PULL_REQUEST_NUMBER ) {
+        Write-Host Nothing to deploy.
+      } else {
+        docker login --username $env:DOCKER_USERNAME --password $env:DOCKER_PASSWORD
+
+        if ( $env:APPVEYOR_REPO_TAG -eq 'true' ) {
+          $major,$minor,$patch = $env:APPVEYOR_REPO_TAG_NAME.substring(1).split('.')
+
+          docker push plugins/gitea-release:windows-amd64
+
+          docker tag plugins/gitea-release:windows-amd64 plugins/gitea-release:$major.$minor.$patch-windows-amd64
+          docker push plugins/gitea-release:$major.$minor.$patch-windows-amd64
+
+          docker tag plugins/gitea-release:windows-amd64 plugins/gitea-release:$major.$minor-windows-amd64
+          docker push plugins/gitea-release:$major.$minor-windows-amd64
+
+          docker tag plugins/gitea-release:windows-amd64 plugins/gitea-release:$major-windows-amd64
+          docker push plugins/gitea-release:$major-windows-amd64
+        } else {
+          if ( $env:APPVEYOR_REPO_BRANCH -eq 'master' ) {
+            docker push plugins/gitea-release:windows-amd64
+          }
+        }
+      }
