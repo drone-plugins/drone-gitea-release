@@ -1,4 +1,4 @@
-FROM plugins/base:i386
+FROM plugins/base:multiarch
 
 LABEL maintainer="Drone.IO Community <drone-dev@googlegroups.com>" \
   org.label-schema.name="Drone Gitea Release" \
