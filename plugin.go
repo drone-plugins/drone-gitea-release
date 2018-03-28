@@ -1,13 +1,16 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/cookiejar"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
-	"io/ioutil"
-	"os"
 )
 
 type (
@@ -31,6 +34,7 @@ type (
 		Checksum   []string
 		Draft      bool
 		PreRelease bool
+		Insecure   bool
 		BaseURL    string
 		Title      string
 		Note       string
@@ -107,6 +111,18 @@ func (p Plugin) Exec() error {
 	}
 
 	client := gitea.NewClient(p.Config.BaseURL, p.Config.APIKey)
+
+	if p.Config.Insecure {
+		cookieJar, _ := cookiejar.New(nil)
+
+		var insecureClient = &http.Client{
+			Jar: cookieJar,
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+		}
+		client.SetHTTPClient(insecureClient)
+	}
 
 	rc := releaseClient{
 		Client:     client,

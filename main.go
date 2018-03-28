@@ -48,6 +48,11 @@ func main() {
 			EnvVar: "PLUGIN_DRAFT,GITEA_RELEASE_DRAFT",
 		},
 		cli.BoolFlag{
+			Name:   "insecure",
+			Usage:  "visit base-url via insecure https protocol",
+			EnvVar: "PLUGIN_INSECURE,GITEA_RELEASE_INSECURE",
+		},
+		cli.BoolFlag{
 			Name:   "prerelease",
 			Usage:  "set the release as prerelease",
 			EnvVar: "PLUGIN_PRERELEASE,GITEA_RELEASE_PRERELEASE",
@@ -126,6 +131,7 @@ func run(c *cli.Context) error {
 			Draft:      c.Bool("draft"),
 			PreRelease: c.Bool("prerelease"),
 			BaseURL:    c.String("base-url"),
+			Insecure:   c.Bool("insecure"),
 			Title:      c.String("title"),
 			Note:       c.String("note"),
 		},
