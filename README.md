@@ -6,6 +6,8 @@
 
 Drone plugin to publish files and artifacts to Gitea Release.
 
+**Note: This plugin requires Gitea 1.5 or newer.**
+
 ## Build
 
 Build the binary with the following commands:
