@@ -12,22 +12,20 @@ manifests:
       architecture: amd64
       os: linux
   -
-    image: plugins/gitea-release:{{#if build.tag}}{{trimPrefix build.tag "v"}}-{{/if}}linux-i386
-    platform:
-      architecture: 386
-      os: linux
-  -
     image: plugins/gitea-release:{{#if build.tag}}{{trimPrefix build.tag "v"}}-{{/if}}linux-arm64
     platform:
       architecture: arm64
       os: linux
+      variant: v8
   -
     image: plugins/gitea-release:{{#if build.tag}}{{trimPrefix build.tag "v"}}-{{/if}}linux-arm
     platform:
       architecture: arm
       os: linux
+      variant: v7
   -
     image: plugins/gitea-release:{{#if build.tag}}{{trimPrefix build.tag "v"}}-{{/if}}windows-amd64
     platform:
       architecture: amd64
       os: windows
+      variant: 1809
