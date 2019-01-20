@@ -1,148 +1,291 @@
-workspace:
-  base: /go
-  path: src/github.com/drone-plugins/drone-gitea-release
+---
+kind: pipeline
+name: testing
 
-pipeline:
-  deps:
-    image: golang:1.10
-    pull: true
-    commands:
-      - go get -u github.com/golang/dep/cmd/dep
-      - dep ensure
+platform:
+  os: linux
+  arch: amd64
 
-  test:
-    image: golang:1.10
-    pull: true
-    commands:
-      - go vet ./...
-      - go test -cover ./...
+steps:
+- name: vet
+  pull: always
+  image: golang:1.11
+  commands:
+  - go vet ./...
+  environment:
+    GO111MODULE: on
 
-  build_linux_amd64:
-    image: golang:1.10
-    pull: true
-    group: build
-    environment:
-      - GOOS=linux
-      - GOARCH=amd64
-      - CGO_ENABLED=0
-    commands:
-      - |
-        if test "${DRONE_TAG}" = ""; then
-          go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-gitea-release
-        else
-          go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-gitea-release
-        fi
+- name: test
+  pull: always
+  image: golang:1.11
+  commands:
+  - go test -cover ./...
+  environment:
+    GO111MODULE: on
 
-  build_linux_i386:
-    image: golang:1.10
-    pull: true
-    group: build
-    environment:
-      - GOOS=linux
-      - GOARCH=386
-      - CGO_ENABLED=0
-    commands:
-      - |
-        if test "${DRONE_TAG}" = ""; then
-          go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/i386/drone-gitea-release
-        else
-          go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/i386/drone-gitea-release
-        fi
+trigger:
+  branch:
+  - master
 
-  build_linux_arm64:
-    image: golang:1.10
-    pull: true
-    group: build
-    environment:
-      - GOOS=linux
-      - GOARCH=arm64
-      - CGO_ENABLED=0
-    commands:
-      - |
-        if test "${DRONE_TAG}" = ""; then
-          go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-gitea-release
-        else
-          go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-gitea-release
-        fi
+---
+kind: pipeline
+name: linux-amd64
 
-  build_linux_arm:
-    image: golang:1.10
-    pull: true
-    group: build
-    environment:
-      - GOOS=linux
-      - GOARCH=arm
-      - CGO_ENABLED=0
-      - GOARM=7
-    commands:
-      - |
-        if test "${DRONE_TAG}" = ""; then
-          go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-gitea-release
-        else
-          go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-gitea-release
-        fi
+platform:
+  os: linux
+  arch: amd64
 
-  publish_linux_amd64:
-    image: plugins/docker:17.12
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    group: docker
+steps:
+- name: build
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-gitea-release"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: build
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-gitea-release"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - tag
+
+- name: dryrun
+  pull: always
+  image: plugins/docker:linux-amd64
+  settings:
+    dockerfile: docker/Dockerfile.linux.amd64
+    dry_run: true
+    password:
+      from_secret: docker_password
     repo: plugins/gitea-release
+    tags: linux-amd64
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - pull_request
+
+- name: publish
+  pull: always
+  image: plugins/docker:linux-amd64
+  settings:
     auto_tag: true
     auto_tag_suffix: linux-amd64
-    dockerfile: Dockerfile
-    when:
-      event: [ push, tag ]
-
-  publish_linux_i386:
-    image: plugins/docker:17.12
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    group: docker
+    dockerfile: docker/Dockerfile.linux.amd64
+    password:
+      from_secret: docker_password
     repo: plugins/gitea-release
-    auto_tag: true
-    auto_tag_suffix: linux-i386
-    dockerfile: Dockerfile.i386
-    when:
-      event: [ push, tag ]
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - push
+    - tag
 
-  publish_linux_arm64:
-    image: plugins/docker:17.12
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    group: docker
+trigger:
+  branch:
+  - master
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+name: linux-arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: build
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-gitea-release"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: build
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-gitea-release"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - tag
+
+- name: dryrun
+  pull: always
+  image: plugins/docker:linux-arm64
+  settings:
+    dockerfile: docker/Dockerfile.linux.arm64
+    dry_run: true
+    password:
+      from_secret: docker_password
     repo: plugins/gitea-release
+    tags: linux-arm64
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - pull_request
+
+- name: publish
+  pull: always
+  image: plugins/docker:linux-arm64
+  settings:
     auto_tag: true
     auto_tag_suffix: linux-arm64
-    dockerfile: Dockerfile.arm64
-    when:
-      event: [ push, tag ]
-
-  publish_linux_arm:
-    image: plugins/docker:17.12
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    group: docker
+    dockerfile: docker/Dockerfile.linux.arm64
+    password:
+      from_secret: docker_password
     repo: plugins/gitea-release
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - push
+    - tag
+
+trigger:
+  branch:
+  - master
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+name: linux-arm
+
+platform:
+  os: linux
+  arch: arm
+
+steps:
+- name: build
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-gitea-release"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: build
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-gitea-release"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - tag
+
+- name: dryrun
+  pull: always
+  image: plugins/docker:linux-arm
+  settings:
+    dockerfile: docker/Dockerfile.linux.arm
+    dry_run: true
+    password:
+      from_secret: docker_password
+    repo: plugins/gitea-release
+    tags: linux-arm
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - pull_request
+
+- name: publish
+  pull: always
+  image: plugins/docker:linux-arm
+  settings:
     auto_tag: true
     auto_tag_suffix: linux-arm
-    dockerfile: Dockerfile.arm
-    when:
-      event: [ push, tag ]
+    dockerfile: docker/Dockerfile.linux.arm
+    password:
+      from_secret: docker_password
+    repo: plugins/gitea-release
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - push
+    - tag
 
-  manifests:
-    image: plugins/manifest:1
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    spec: manifest.tmpl
-    auto_tag: true
+trigger:
+  branch:
+  - master
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+name: notifications
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: manifest
+  pull: always
+  image: plugins/manifest:1
+  settings:
     ignore_missing: true
-    when:
-      event: [ push, tag ]
+    password:
+      from_secret: docker_password
+    spec: docker/manifest.tmpl
+    username:
+      from_secret: docker_username
 
-  microbadger:
-    image: plugins/webhook:1
-    pull: true
-    secrets: [ webhook_url ]
-    when:
-      status: [ success ]
+- name: microbadger
+  pull: always
+  image: plugins/webhook:1
+  settings:
+    url:
+      from_secret: microbadger_url
+
+trigger:
+  branch:
+  - master
+  event:
+  - push
+  - tag
+
+depends_on:
+- linux-amd64
+- linux-arm64
+- linux-arm
+
+...
