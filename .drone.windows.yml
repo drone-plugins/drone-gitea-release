@@ -1,9 +1,9 @@
 ---
 kind: pipeline
-name: linux-amd64
+name: windows-amd64
 
 platform:
-  os: linux
+  os: windows
   arch: amd64
 
 steps:
@@ -11,7 +11,7 @@ steps:
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-gitea-release"
+  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/windows/amd64/drone-gitea-release"
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
@@ -24,7 +24,7 @@ steps:
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-gitea-release"
+  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/windows/amd64/drone-gitea-release"
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
@@ -34,14 +34,14 @@ steps:
 
 - name: dryrun
   pull: always
-  image: plugins/docker:linux-amd64
+  image: plugins/docker:windows-amd64
   settings:
-    dockerfile: docker/Dockerfile.linux.amd64
+    dockerfile: docker/Dockerfile.windows.amd64
     dry_run: true
     password:
       from_secret: docker_password
     repo: plugins/gitea-release
-    tags: linux-amd64
+    tags: windows-amd64
     username:
       from_secret: docker_username
   when:
@@ -50,11 +50,11 @@ steps:
 
 - name: publish
   pull: always
-  image: plugins/docker:linux-amd64
+  image: plugins/docker:windows-amd64
   settings:
     auto_tag: true
-    auto_tag_suffix: linux-amd64
-    dockerfile: docker/Dockerfile.linux.amd64
+    auto_tag_suffix: windows-amd64
+    dockerfile: docker/Dockerfile.windows.amd64
     password:
       from_secret: docker_password
     repo: plugins/gitea-release

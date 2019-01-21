@@ -43,7 +43,7 @@ local PipelineBuild(os="linux", arch="amd64") = {
   },
   steps: [
     {
-      name: "build",
+      name: "build-push",
       image: "golang:1.11",
       pull: "always",
       environment: {
@@ -58,7 +58,7 @@ local PipelineBuild(os="linux", arch="amd64") = {
       },
     },
     {
-      name: "build",
+      name: "build-tag",
       image: "golang:1.11",
       pull: "always",
       environment: {
