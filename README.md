@@ -7,7 +7,6 @@
 [![](https://images.microbadger.com/badges/image/plugins/gitea-release.svg)](https://microbadger.com/images/plugins/gitea-release "Get your own image badge on microbadger.com")
 [![Go Doc](https://godoc.org/github.com/drone-plugins/drone-gitea-release?status.svg)](http://godoc.org/github.com/drone-plugins/drone-gitea-release)
 [![Go Report](https://goreportcard.com/badge/github.com/drone-plugins/drone-gitea-release)](https://goreportcard.com/report/github.com/drone-plugins/drone-gitea-release)
-[![](https://images.microbadger.com/badges/image/plugins/gitea-release.svg)](https://microbadger.com/images/plugins/gitea-release "Get your own image badge on microbadger.com")
 
 Drone plugin to publish files and artifacts to Gitea Release.
 
