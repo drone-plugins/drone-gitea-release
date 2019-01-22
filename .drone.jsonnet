@@ -73,6 +73,14 @@ local PipelineBuild(os="linux", arch="amd64") = {
       },
     },
     {
+      name: "executable",
+      image: "golang:1.11",
+      pull: "always",
+      commands: [
+        "./release/" + os + "/" + arch + "/drone-gitea-release --help",
+      ],
+    },
+    {
       name: "dryrun",
       image: "plugins/docker:" + os + "-" + arch,
       pull: "always",

@@ -7,7 +7,7 @@ platform:
   arch: amd64
 
 steps:
-- name: build
+- name: build-push
   pull: always
   image: golang:1.11
   commands:
@@ -20,7 +20,7 @@ steps:
     - push
     - pull_request
 
-- name: build
+- name: build-tag
   pull: always
   image: golang:1.11
   commands:
@@ -31,6 +31,12 @@ steps:
   when:
     event:
     - tag
+
+- name: executable
+  pull: always
+  image: golang:1.11
+  commands:
+  - ./release/windows/amd64/drone-gitea-release --help
 
 - name: dryrun
   pull: always
