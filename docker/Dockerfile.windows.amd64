@@ -1,12 +1,10 @@
 # escape=`
-FROM microsoft/nanoserver:10.0.14393.1593
+FROM plugins/base:windows-amd64
 
 LABEL maintainer="Drone.IO Community <drone-dev@googlegroups.com>" `
   org.label-schema.name="Drone Gitea Release" `
   org.label-schema.vendor="Drone.IO Community" `
   org.label-schema.schema-version="1.0"
-
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 ADD release\drone-gitea-release.exe c:\drone-gitea-release.exe
 ENTRYPOINT [ "c:\\drone-gitea-release.exe" ]
