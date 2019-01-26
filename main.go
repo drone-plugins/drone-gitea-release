@@ -97,6 +97,11 @@ func main() {
 			EnvVar: "DRONE_COMMIT_REF",
 		},
 		cli.StringFlag{
+			Name:   "commit.sha",
+			Usage:  "git commit sha",
+			EnvVar: "DRONE_COMMIT_SHA",
+		},
+		cli.StringFlag{
 			Name:  "env-file",
 			Usage: "source env file",
 		},

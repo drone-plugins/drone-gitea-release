@@ -14,6 +14,7 @@ type releaseClient struct {
 	Owner      string
 	Repo       string
 	Tag        string
+	CommitSha  string
 	Draft      bool
 	Prerelease bool
 	FileExists string
@@ -59,6 +60,7 @@ func (rc *releaseClient) getRelease() (*gitea.Release, error) {
 func (rc *releaseClient) newRelease() (*gitea.Release, error) {
 	r := gitea.CreateReleaseOption{
 		TagName:      rc.Tag,
+		Target:       rc.CommitSha,
 		IsDraft:      rc.Draft,
 		IsPrerelease: rc.Prerelease,
 		Title:        rc.Title,

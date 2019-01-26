@@ -25,6 +25,7 @@ type (
 
 	Commit struct {
 		Ref string
+		Sha string
 	}
 
 	Config struct {
@@ -129,6 +130,7 @@ func (p Plugin) Exec() error {
 		Owner:      p.Repo.Owner,
 		Repo:       p.Repo.Name,
 		Tag:        strings.TrimPrefix(p.Commit.Ref, "refs/tags/"),
+		CommitSha:  p.Commit.Sha,
 		Draft:      p.Config.Draft,
 		Prerelease: p.Config.PreRelease,
 		FileExists: p.Config.FileExists,
