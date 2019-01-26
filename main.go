@@ -127,6 +127,7 @@ func run(c *cli.Context) error {
 		},
 		Commit: Commit{
 			Ref: c.String("commit.ref"),
+			Sha: c.String("commit.sha"),
 		},
 		Config: Config{
 			APIKey:     c.String("api-key"),
