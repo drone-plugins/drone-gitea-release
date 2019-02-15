@@ -8,15 +8,43 @@
 [![Go Doc](https://godoc.org/github.com/drone-plugins/drone-gitea-release?status.svg)](http://godoc.org/github.com/drone-plugins/drone-gitea-release)
 [![Go Report](https://goreportcard.com/badge/github.com/drone-plugins/drone-gitea-release)](https://goreportcard.com/report/github.com/drone-plugins/drone-gitea-release)
 
-Drone plugin to publish files and artifacts to Gitea Release.
-
-**Note: This plugin requires Gitea 1.5 or newer.**
+Drone plugin to publish files and artifacts to Gitea release. For the usage information and a listing of the available options please take a look at [the docs](http://plugins.drone.io/drone-plugins/drone-gitea-release/).
 
 ## Build
 
-Build the binary with the following commands:
+Build the binary with the following command:
 
+```console
+export GOOS=linux
+export GOARCH=amd64
+export CGO_ENABLED=0
+export GO111MODULE=on
+
+go build -v -a -tags netgo -o release/linux/amd64/drone-gitea-release
 ```
-GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -tags netgo -o release/linux/amd64/drone-gitea-release
-docker build --rm -t plugins/gitea-release .
+
+## Docker
+
+Build the Docker image with the following command:
+
+```console
+docker build \
+  --label org.label-schema.build-date=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --label org.label-schema.vcs-ref=$(git rev-parse --short HEAD) \
+  --file docker/Dockerfile.linux.amd64 --tag plugins/gitea-release .
+```
+
+## Usage
+
+```console
+docker run --rm \
+  -e PLUGIN_BASE_URL=https://try.gitea.io \
+  -e PLUGIN_API_KEY=your-api-key \
+  -e PLUGIN_FILES=build/* \
+  -e DRONE_REPO_OWNER=gitea \
+  -e DRONE_REPO_NAME=test \
+  -e DRONE_BUILD_EVENT=tag \
+  -v $(pwd):$(pwd) \
+  -w $(pwd) \
+  plugins/gitea-release
 ```
