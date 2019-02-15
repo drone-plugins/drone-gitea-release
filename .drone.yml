@@ -14,6 +14,9 @@ steps:
   - go vet ./...
   environment:
     GO111MODULE: on
+  volumes:
+  - name: gopath
+    path: /go
 
 - name: test
   pull: always
@@ -22,10 +25,19 @@ steps:
   - go test -cover ./...
   environment:
     GO111MODULE: on
+  volumes:
+  - name: gopath
+    path: /go
+
+volumes:
+- name: gopath
+  temp: {}
 
 trigger:
-  branch:
-  - master
+  ref:
+  - refs/heads/master
+  - "refs/tags/**"
+  - "refs/pull/**"
 
 ---
 kind: pipeline
@@ -40,20 +52,20 @@ steps:
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-gitea-release"
+  - "go build -v -ldflags \"-X main.version=${DRONE_COMMIT_SHA:0:8}\" -a -tags netgo -o release/linux/amd64/drone-gitea-release"
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
   when:
     event:
-    - push
-    - pull_request
+      exclude:
+      - tag
 
 - name: build-tag
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-gitea-release"
+  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v}\" -a -tags netgo -o release/linux/amd64/drone-gitea-release"
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
@@ -71,6 +83,7 @@ steps:
   pull: always
   image: plugins/docker:linux-amd64
   settings:
+    daemon_off: false
     dockerfile: docker/Dockerfile.linux.amd64
     dry_run: true
     password:
@@ -89,6 +102,7 @@ steps:
   settings:
     auto_tag: true
     auto_tag_suffix: linux-amd64
+    daemon_off: false
     dockerfile: docker/Dockerfile.linux.amd64
     password:
       from_secret: docker_password
@@ -97,12 +111,14 @@ steps:
       from_secret: docker_username
   when:
     event:
-    - push
-    - tag
+      exclude:
+      - pull_request
 
 trigger:
-  branch:
-  - master
+  ref:
+  - refs/heads/master
+  - "refs/tags/**"
+  - "refs/pull/**"
 
 depends_on:
 - testing
@@ -120,20 +136,20 @@ steps:
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-gitea-release"
+  - "go build -v -ldflags \"-X main.version=${DRONE_COMMIT_SHA:0:8}\" -a -tags netgo -o release/linux/arm64/drone-gitea-release"
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
   when:
     event:
-    - push
-    - pull_request
+      exclude:
+      - tag
 
 - name: build-tag
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-gitea-release"
+  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v}\" -a -tags netgo -o release/linux/arm64/drone-gitea-release"
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
@@ -151,6 +167,7 @@ steps:
   pull: always
   image: plugins/docker:linux-arm64
   settings:
+    daemon_off: false
     dockerfile: docker/Dockerfile.linux.arm64
     dry_run: true
     password:
@@ -169,6 +186,7 @@ steps:
   settings:
     auto_tag: true
     auto_tag_suffix: linux-arm64
+    daemon_off: false
     dockerfile: docker/Dockerfile.linux.arm64
     password:
       from_secret: docker_password
@@ -177,12 +195,14 @@ steps:
       from_secret: docker_username
   when:
     event:
-    - push
-    - tag
+      exclude:
+      - pull_request
 
 trigger:
-  branch:
-  - master
+  ref:
+  - refs/heads/master
+  - "refs/tags/**"
+  - "refs/pull/**"
 
 depends_on:
 - testing
@@ -200,20 +220,20 @@ steps:
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-gitea-release"
+  - "go build -v -ldflags \"-X main.version=${DRONE_COMMIT_SHA:0:8}\" -a -tags netgo -o release/linux/arm/drone-gitea-release"
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
   when:
     event:
-    - push
-    - pull_request
+      exclude:
+      - tag
 
 - name: build-tag
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-gitea-release"
+  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v}\" -a -tags netgo -o release/linux/arm/drone-gitea-release"
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
@@ -231,6 +251,7 @@ steps:
   pull: always
   image: plugins/docker:linux-arm
   settings:
+    daemon_off: false
     dockerfile: docker/Dockerfile.linux.arm
     dry_run: true
     password:
@@ -249,6 +270,7 @@ steps:
   settings:
     auto_tag: true
     auto_tag_suffix: linux-arm
+    daemon_off: false
     dockerfile: docker/Dockerfile.linux.arm
     password:
       from_secret: docker_password
@@ -257,12 +279,14 @@ steps:
       from_secret: docker_username
   when:
     event:
-    - push
-    - tag
+      exclude:
+      - pull_request
 
 trigger:
-  branch:
-  - master
+  ref:
+  - refs/heads/master
+  - "refs/tags/**"
+  - "refs/pull/**"
 
 depends_on:
 - testing
@@ -278,7 +302,7 @@ platform:
 steps:
 - name: manifest
   pull: always
-  image: plugins/manifest:1
+  image: plugins/manifest
   settings:
     ignore_missing: true
     password:
@@ -289,17 +313,15 @@ steps:
 
 - name: microbadger
   pull: always
-  image: plugins/webhook:1
+  image: plugins/webhook
   settings:
     url:
       from_secret: microbadger_url
 
 trigger:
-  branch:
-  - master
-  event:
-  - push
-  - tag
+  ref:
+  - refs/heads/master
+  - "refs/tags/**"
 
 depends_on:
 - linux-amd64
