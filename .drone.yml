@@ -304,6 +304,7 @@ steps:
   pull: always
   image: plugins/manifest
   settings:
+    auto_tag: true
     ignore_missing: true
     password:
       from_secret: docker_password
@@ -315,7 +316,7 @@ steps:
   pull: always
   image: plugins/webhook
   settings:
-    url:
+    urls:
       from_secret: microbadger_url
 
 trigger:
