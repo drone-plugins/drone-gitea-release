@@ -42,7 +42,7 @@ func (rc *releaseClient) buildRelease() (*gitea.Release, error) {
 }
 
 func (rc *releaseClient) getRelease() (*gitea.Release, error) {
-	releases, err := rc.Client.ListReleases(rc.Owner, rc.Repo)
+	releases, err := rc.Client.ListReleases(rc.Owner, rc.Repo, gitea.ListReleasesOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (rc *releaseClient) newRelease() (*gitea.Release, error) {
 }
 
 func (rc *releaseClient) uploadFiles(releaseID int64, files []string) error {
-	attachments, err := rc.Client.ListReleaseAttachments(rc.Owner, rc.Repo, releaseID)
+	attachments, err := rc.Client.ListReleaseAttachments(rc.Owner, rc.Repo, releaseID, gitea.ListReleaseAttachmentsOptions{})
 
 	if err != nil {
 		return fmt.Errorf("Failed to fetch existing assets: %s", err)
