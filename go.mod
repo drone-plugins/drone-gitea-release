@@ -1,7 +1,10 @@
 module github.com/drone-plugins/drone-gitea-release
 
+go 1.14
+
 require (
 	code.gitea.io/sdk v0.0.0-20180306012245-fa91af7569e6
+	code.gitea.io/sdk/gitea v0.12.0 // indirect
 	github.com/Sirupsen/logrus v1.0.5
 	github.com/joho/godotenv v1.2.0
 	github.com/urfave/cli v1.20.0
