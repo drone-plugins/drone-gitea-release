@@ -42,7 +42,7 @@ func (rc *releaseClient) buildRelease() (*gitea.Release, error) {
 }
 
 func (rc *releaseClient) getRelease() (*gitea.Release, error) {
-	releases, err := rc.Client.ListReleases(rc.Owner, rc.Repo, gitea.ListReleasesOptions{})
+	releases, _, err := rc.Client.ListReleases(rc.Owner, rc.Repo, gitea.ListReleasesOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (rc *releaseClient) newRelease() (*gitea.Release, error) {
 		Note:         rc.Note,
 	}
 
-	release, err := rc.Client.CreateRelease(rc.Owner, rc.Repo, r)
+	release, _, err := rc.Client.CreateRelease(rc.Owner, rc.Repo, r)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create release: %s", err)
 	}
@@ -75,7 +75,7 @@ func (rc *releaseClient) newRelease() (*gitea.Release, error) {
 }
 
 func (rc *releaseClient) uploadFiles(releaseID int64, files []string) error {
-	attachments, err := rc.Client.ListReleaseAttachments(rc.Owner, rc.Repo, releaseID, gitea.ListReleaseAttachmentsOptions{})
+	attachments, _, err := rc.Client.ListReleaseAttachments(rc.Owner, rc.Repo, releaseID, gitea.ListReleaseAttachmentsOptions{})
 
 	if err != nil {
 		return fmt.Errorf("Failed to fetch existing assets: %s", err)
@@ -113,7 +113,7 @@ files:
 
 		for _, attachment := range attachments {
 			if attachment.Name == path.Base(file) {
-				if err := rc.Client.DeleteReleaseAttachment(rc.Owner, rc.Repo, releaseID, attachment.ID); err != nil {
+				if _, err := rc.Client.DeleteReleaseAttachment(rc.Owner, rc.Repo, releaseID, attachment.ID); err != nil {
 					return fmt.Errorf("Failed to delete %s artifact: %s", file, err)
 				}
 
@@ -121,7 +121,7 @@ files:
 			}
 		}
 
-		if _, err = rc.Client.CreateReleaseAttachment(rc.Owner, rc.Repo, releaseID, handle, path.Base(file)); err != nil {
+		if _, _, err = rc.Client.CreateReleaseAttachment(rc.Owner, rc.Repo, releaseID, handle, path.Base(file)); err != nil {
 			return fmt.Errorf("Failed to upload %s artifact: %s", file, err)
 		}
 
