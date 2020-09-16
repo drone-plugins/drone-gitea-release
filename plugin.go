@@ -110,18 +110,19 @@ func (p Plugin) Exec() error {
 		}
 	}
 
-	client := gitea.NewClient(p.Config.BaseURL, p.Config.APIKey)
-
+	httpClient := &http.Client{}
 	if p.Config.Insecure {
 		cookieJar, _ := cookiejar.New(nil)
-
-		var insecureClient = &http.Client{
+		httpClient = &http.Client{
 			Jar: cookieJar,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
 		}
-		client.SetHTTPClient(insecureClient)
+	}
+	client, err := gitea.NewClient(p.Config.BaseURL, gitea.SetToken(p.Config.APIKey), gitea.SetHTTPClient(httpClient))
+	if err != nil {
+		return err
 	}
 
 	rc := releaseClient{

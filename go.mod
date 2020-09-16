@@ -3,7 +3,7 @@ module github.com/drone-plugins/drone-gitea-release
 go 1.14
 
 require (
-	code.gitea.io/sdk/gitea v0.12.0
+	code.gitea.io/sdk/gitea v0.13.0
 	github.com/Sirupsen/logrus v1.0.5
 	github.com/joho/godotenv v1.2.0
 	github.com/onsi/ginkgo v1.12.2 // indirect

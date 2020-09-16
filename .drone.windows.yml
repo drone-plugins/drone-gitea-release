@@ -10,7 +10,7 @@ platform:
 steps:
 - name: vet
   pull: always
-  image: golang:1.11-windowsservercore-1803
+  image: golang:1.13-windowsservercore-1803
   commands:
   - go vet ./...
   environment:
@@ -21,7 +21,7 @@ steps:
 
 - name: test
   pull: always
-  image: golang:1.11-windowsservercore-1803
+  image: golang:1.13-windowsservercore-1803
   commands:
   - go test -cover ./...
   environment:
@@ -52,7 +52,7 @@ platform:
 steps:
 - name: build-push
   pull: always
-  image: golang:1.11-windowsservercore-1803
+  image: golang:1.13-windowsservercore-1803
   commands:
   - "go build -v -ldflags \"-X main.version=${DRONE_COMMIT_SHA:0:8}\" -a -tags netgo -o release/windows/amd64/drone-gitea-release.exe"
   environment:
@@ -65,7 +65,7 @@ steps:
 
 - name: build-tag
   pull: always
-  image: golang:1.11-windowsservercore-1803
+  image: golang:1.13-windowsservercore-1803
   commands:
   - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v}\" -a -tags netgo -o release/windows/amd64/drone-gitea-release.exe"
   environment:
@@ -77,7 +77,7 @@ steps:
 
 - name: executable
   pull: always
-  image: golang:1.11-windowsservercore-1803
+  image: golang:1.13-windowsservercore-1803
   commands:
   - ./release/windows/amd64/drone-gitea-release.exe --help
 
@@ -148,7 +148,7 @@ platform:
 steps:
 - name: build-push
   pull: always
-  image: golang:1.11-windowsservercore-1809
+  image: golang:1.13-windowsservercore-1809
   commands:
   - "go build -v -ldflags \"-X main.version=${DRONE_COMMIT_SHA:0:8}\" -a -tags netgo -o release/windows/amd64/drone-gitea-release.exe"
   environment:
@@ -161,7 +161,7 @@ steps:
 
 - name: build-tag
   pull: always
-  image: golang:1.11-windowsservercore-1809
+  image: golang:1.13-windowsservercore-1809
   commands:
   - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v}\" -a -tags netgo -o release/windows/amd64/drone-gitea-release.exe"
   environment:
@@ -173,7 +173,7 @@ steps:
 
 - name: executable
   pull: always
-  image: golang:1.11-windowsservercore-1809
+  image: golang:1.13-windowsservercore-1809
   commands:
   - ./release/windows/amd64/drone-gitea-release.exe --help
 
