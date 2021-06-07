@@ -137,6 +137,12 @@ func (p Plugin) Exec() error {
 		Note:       p.Config.Note,
 	}
 
+	// if the title was not provided via .drone.yml we use the tag instead
+	// fixes https://github.com/drone-plugins/drone-gitea-release/issues/26
+	if rc.Title == "" {
+		rc.Title = rc.Tag
+	}
+	
 	release, err := rc.buildRelease()
 
 	if err != nil {
