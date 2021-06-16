@@ -6,4 +6,4 @@ LABEL maintainer="Drone.IO Community <drone-dev@googlegroups.com>" \
   org.label-schema.schema-version="1.0"
 
 ADD release/linux/amd64/drone-gitea-release /bin/
-ENTRYPOINT ["/bin/drone-gitea-release"]
+ENTRYPOINT [ "/bin/drone-gitea-release" ]

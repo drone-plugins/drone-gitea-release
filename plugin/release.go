@@ -1,4 +1,9 @@
-package main
+// Copyright (c) 2021, the Drone Plugins project authors.
+// Please see the AUTHORS file for details. All rights reserved.
+// Use of this source code is governed by an Apache 2.0 license that can be
+// found in the LICENSE file.
+
+package plugin
 
 import (
 	"fmt"
@@ -35,7 +40,7 @@ func (rc *releaseClient) buildRelease() (*gitea.Release, error) {
 	release, err = rc.newRelease()
 
 	if err != nil {
-		return nil, fmt.Errorf("Failed to retrieve or create a release: %s", err)
+		return nil, fmt.Errorf("failed to retrieve or create a release: %s", err)
 	}
 
 	return release, nil
@@ -49,11 +54,11 @@ func (rc *releaseClient) getRelease() (*gitea.Release, error) {
 
 	for _, release := range releases {
 		if release.TagName == rc.Tag {
-			fmt.Printf("Successfully retrieved %s release\n", rc.Tag)
+			fmt.Printf("successfully retrieved %s release\n", rc.Tag)
 			return release, nil
 		}
 	}
-	return nil, fmt.Errorf("Release %s not found", rc.Tag)
+	return nil, fmt.Errorf("release %s not found", rc.Tag)
 }
 
 func (rc *releaseClient) newRelease() (*gitea.Release, error) {
@@ -67,10 +72,10 @@ func (rc *releaseClient) newRelease() (*gitea.Release, error) {
 
 	release, _, err := rc.Client.CreateRelease(rc.Owner, rc.Repo, r)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to create release: %s", err)
+		return nil, fmt.Errorf("failed to create release: %s", err)
 	}
 
-	fmt.Printf("Successfully created %s release\n", rc.Tag)
+	fmt.Printf("successfully created %s release\n", rc.Tag)
 	return release, nil
 }
 
@@ -78,7 +83,7 @@ func (rc *releaseClient) uploadFiles(releaseID int64, files []string) error {
 	attachments, _, err := rc.Client.ListReleaseAttachments(rc.Owner, rc.Repo, releaseID, gitea.ListReleaseAttachmentsOptions{})
 
 	if err != nil {
-		return fmt.Errorf("Failed to fetch existing assets: %s", err)
+		return fmt.Errorf("failed to fetch existing assets: %s", err)
 	}
 
 	var uploadFiles []string
@@ -91,12 +96,12 @@ files:
 				case "overwrite":
 					// do nothing
 				case "fail":
-					return fmt.Errorf("Asset file %s already exists", path.Base(file))
+					return fmt.Errorf("asset file %s already exists", path.Base(file))
 				case "skip":
-					fmt.Printf("Skipping pre-existing %s artifact\n", attachment.Name)
+					fmt.Printf("skipping pre-existing %s artifact\n", attachment.Name)
 					continue files
 				default:
-					return fmt.Errorf("Internal error, unkown file_exist value %s", rc.FileExists)
+					return fmt.Errorf("internal error, unkown file_exist value %s", rc.FileExists)
 				}
 			}
 		}
@@ -108,24 +113,24 @@ files:
 		handle, err := os.Open(file)
 
 		if err != nil {
-			return fmt.Errorf("Failed to read %s artifact: %s", file, err)
+			return fmt.Errorf("failed to read %s artifact: %s", file, err)
 		}
 
 		for _, attachment := range attachments {
 			if attachment.Name == path.Base(file) {
 				if _, err := rc.Client.DeleteReleaseAttachment(rc.Owner, rc.Repo, releaseID, attachment.ID); err != nil {
-					return fmt.Errorf("Failed to delete %s artifact: %s", file, err)
+					return fmt.Errorf("failed to delete %s artifact: %s", file, err)
 				}
 
-				fmt.Printf("Successfully deleted old %s artifact\n", attachment.Name)
+				fmt.Printf("successfully deleted old %s artifact\n", attachment.Name)
 			}
 		}
 
 		if _, _, err = rc.Client.CreateReleaseAttachment(rc.Owner, rc.Repo, releaseID, handle, path.Base(file)); err != nil {
-			return fmt.Errorf("Failed to upload %s artifact: %s", file, err)
+			return fmt.Errorf("failed to upload %s artifact: %s", file, err)
 		}
 
-		fmt.Printf("Successfully uploaded %s artifact\n", file)
+		fmt.Printf("successfully uploaded %s artifact\n", file)
 	}
 
 	return nil

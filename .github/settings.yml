@@ -1,6 +1,6 @@
 repository:
   name: drone-gitea-release
-  description: Drone plugin for creating and tagging Gitea releases
+  description: Drone plugin for creating and tagging GitHub releases
   homepage: http://plugins.drone.io/drone-plugins/drone-gitea-release
   topics: drone, drone-plugin
 
@@ -69,5 +69,9 @@ branches:
           - continuous-integration/drone/pr
       enforce_admins: false
       restrictions:
+        apps:
+          - renovate
         users: []
-        teams: []
+        teams:
+          - Admins
+          - Maintainers
