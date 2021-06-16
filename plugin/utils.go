@@ -1,4 +1,9 @@
-package main
+// Copyright (c) 2021, the Drone Plugins project authors.
+// Please see the AUTHORS file for details. All rights reserved.
+// Use of this source code is governed by an Apache 2.0 license that can be
+// found in the LICENSE file.
+
+package plugin
 
 import (
 	"crypto/md5"
@@ -11,9 +16,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strconv"
-	"strings"
 )
 
 var (
@@ -24,13 +27,19 @@ var (
 	}
 )
 
-func execute(cmd *exec.Cmd) error {
-	fmt.Println("+", strings.Join(cmd.Args, " "))
-
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-
-	return cmd.Run()
+func readStringOrFile(input string) (string, error) {
+	// Check if input is a file path
+	if _, err := os.Stat(input); err != nil && os.IsNotExist(err) {
+		// No file found => use input as result
+		return input, nil
+	} else if err != nil {
+		return "", err
+	}
+	result, err := ioutil.ReadFile(input)
+	if err != nil {
+		return "", err
+	}
+	return string(result), nil
 }
 
 func checksum(r io.Reader, method string) (string, error) {
@@ -55,7 +64,7 @@ func checksum(r io.Reader, method string) (string, error) {
 		return strconv.FormatUint(uint64(crc32.ChecksumIEEE(b)), 10), nil
 	}
 
-	return "", fmt.Errorf("Hashing method %s is not supported", method)
+	return "", fmt.Errorf("hashing method %s is not supported", method)
 }
 
 func writeChecksums(files, methods []string) ([]string, error) {
@@ -66,7 +75,7 @@ func writeChecksums(files, methods []string) ([]string, error) {
 			handle, err := os.Open(file)
 
 			if err != nil {
-				return nil, fmt.Errorf("Failed to read %s artifact: %s", file, err)
+				return nil, fmt.Errorf("failed to read %s artifact: %s", file, err)
 			}
 
 			hash, err := checksum(handle, method)
