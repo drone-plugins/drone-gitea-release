@@ -5,7 +5,6 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
-	"crypto/blake2b"
 	"fmt"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/blake2s"
