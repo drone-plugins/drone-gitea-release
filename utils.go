@@ -6,6 +6,8 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"fmt"
+	"golang.org/x/crypto/blake2b"
+	"golang.org/x/crypto/blake2s"
 	"hash/adler32"
 	"hash/crc32"
 	"io"
@@ -53,6 +55,10 @@ func checksum(r io.Reader, method string) (string, error) {
 		return strconv.FormatUint(uint64(adler32.Checksum(b)), 10), nil
 	case "crc32":
 		return strconv.FormatUint(uint64(crc32.ChecksumIEEE(b)), 10), nil
+	case "blake2b":
+		return fmt.Sprintf("%x", blake2b.Sum256(b)), nil
+	case "blake2s":
+		return fmt.Sprintf("%x", blake2s.Sum256(b)), nil
 	}
 
 	return "", fmt.Errorf("Hashing method %s is not supported", method)
