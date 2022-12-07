@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
 	"os"
@@ -142,7 +141,7 @@ func (p Plugin) Exec() error {
 	if rc.Title == "" {
 		rc.Title = rc.Tag
 	}
-	
+
 	release, err := rc.buildRelease()
 
 	if err != nil {
@@ -164,7 +163,7 @@ func readStringOrFile(input string) (string, error) {
 	} else if err != nil {
 		return "", err
 	}
-	result, err := ioutil.ReadFile(input)
+	result, err := os.ReadFile(input)
 	if err != nil {
 		return "", err
 	}

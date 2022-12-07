@@ -6,16 +6,14 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"fmt"
-	"golang.org/x/crypto/blake2b"
-	"golang.org/x/crypto/blake2s"
 	"hash/adler32"
 	"hash/crc32"
 	"io"
-	"io/ioutil"
 	"os"
-	"os/exec"
 	"strconv"
-	"strings"
+
+	"golang.org/x/crypto/blake2b"
+	"golang.org/x/crypto/blake2s"
 )
 
 var (
@@ -26,17 +24,8 @@ var (
 	}
 )
 
-func execute(cmd *exec.Cmd) error {
-	fmt.Println("+", strings.Join(cmd.Args, " "))
-
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-
-	return cmd.Run()
-}
-
 func checksum(r io.Reader, method string) (string, error) {
-	b, err := ioutil.ReadAll(r)
+	b, err := io.ReadAll(r)
 
 	if err != nil {
 		return "", err
