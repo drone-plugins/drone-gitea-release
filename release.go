@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 
 	"code.gitea.io/sdk/gitea"
 )
@@ -86,12 +86,12 @@ func (rc *releaseClient) uploadFiles(releaseID int64, files []string) error {
 files:
 	for _, file := range files {
 		for _, attachment := range attachments {
-			if attachment.Name == path.Base(file) {
+			if attachment.Name == filepath.Base(file) {
 				switch rc.FileExists {
 				case "overwrite":
 					// do nothing
 				case "fail":
-					return fmt.Errorf("Asset file %s already exists", path.Base(file))
+					return fmt.Errorf("Asset file %s already exists", filepath.Base(file))
 				case "skip":
 					fmt.Printf("Skipping pre-existing %s artifact\n", attachment.Name)
 					continue files
@@ -112,7 +112,7 @@ files:
 		}
 
 		for _, attachment := range attachments {
-			if attachment.Name == path.Base(file) {
+			if attachment.Name == filepath.Base(file) {
 				if _, err := rc.Client.DeleteReleaseAttachment(rc.Owner, rc.Repo, releaseID, attachment.ID); err != nil {
 					return fmt.Errorf("Failed to delete %s artifact: %s", file, err)
 				}
@@ -121,7 +121,7 @@ files:
 			}
 		}
 
-		if _, _, err = rc.Client.CreateReleaseAttachment(rc.Owner, rc.Repo, releaseID, handle, path.Base(file)); err != nil {
+		if _, _, err = rc.Client.CreateReleaseAttachment(rc.Owner, rc.Repo, releaseID, handle, filepath.Base(file)); err != nil {
 			return fmt.Errorf("Failed to upload %s artifact: %s", file, err)
 		}
 
