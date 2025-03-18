@@ -1,0 +1,383 @@
+pipeline:
+  name: drone-gitea-release-harness
+  identifier: dronegiteareleaseharness
+  projectIdentifier: Drone_Plugins
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: GitHub_Drone_Plugins_Org
+        repoName: drone-gitea-release
+        build: <+input>
+        sparseCheckout: []
+  stages:
+    - stage:
+        name: Testing Stage
+        identifier: Testing_Stage
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: false
+            paths: []
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Lint
+                  identifier: Lint
+                  spec:
+                    connectorRef: Plugins_Docker_Hub_Connector
+                    image: golang:1.20
+                    shell: Sh
+                    command: |-
+                      go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+                      golangci-lint version
+                      golangci-lint run
+              - step:
+                  type: Run
+                  name: Test
+                  identifier: Run_1
+                  spec:
+                    connectorRef: Plugins_Docker_Hub_Connector
+                    image: golang:1.20
+                    shell: Sh
+                    command: go test -cover ./...
+        description: ""
+    - parallel:
+        - stage:
+            name: linux-amd64
+            identifier: linuxamd64
+            type: CI
+            spec:
+              cloneCodebase: true
+              caching:
+                enabled: false
+                paths: []
+              platform:
+                os: Linux
+                arch: Amd64
+              runtime:
+                type: Cloud
+                spec: {}
+              execution:
+                steps:
+                  - step:
+                      name: Build binaries
+                      identifier: Build_binaries
+                      type: Run
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        image: golang:1.20
+                        shell: Sh
+                        command: |-
+                          # force go modules
+                          export GOPATH=""
+
+                          # disable cgo
+                          export CGO_ENABLED=0
+
+                          set -e
+                          set -x
+
+                          # linux
+                          export GOOS=linux GOARCH=amd64
+                          go build -v -a -tags netgo -o release/linux/amd64/drone-gitea-release .
+                      when:
+                        stageStatus: Success
+                  - step:
+                      type: Plugin
+                      name: BuildAndPushDockerPlugin
+                      identifier: BuildAndPushDockerPlugin
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        image: plugins/docker
+                        settings:
+                          username: drone
+                          password: <+secrets.getValue("Plugins_Docker_Hub_Pat")>
+                          repo: plugins/gitea-release
+                          dockerfile: docker/Dockerfile.linux.amd64
+                          auto_tag: "true"
+                          auto_tag_suffix: linux-amd64
+                      when:
+                        stageStatus: Success
+                        condition: <+codebase.build.type> == "tag"
+                  - step:
+                      type: BuildAndPushDockerRegistry
+                      name: BuildAndPushDockerRegistry
+                      identifier: BuildAndPushDockerRegistry
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        repo: plugins/gitea-release
+                        tags:
+                          - linux-amd64
+                        caching: false
+                        dockerfile: docker/Dockerfile.linux.amd64
+                      when:
+                        stageStatus: Success
+                        condition: |
+                          <+codebase.build.type> == "branch"
+            description: ""
+        - stage:
+            name: linux-arm64
+            identifier: linuxarm64
+            type: CI
+            spec:
+              cloneCodebase: true
+              caching:
+                enabled: false
+                paths: []
+              platform:
+                os: Linux
+                arch: Arm64
+              runtime:
+                type: Cloud
+                spec: {}
+              execution:
+                steps:
+                  - step:
+                      name: Build binaries
+                      identifier: Build_binaries
+                      type: Run
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        image: golang:1.20
+                        shell: Sh
+                        command: |-
+                          # force go modules
+                          export GOPATH=""
+
+                          # disable cgo
+                          export CGO_ENABLED=0
+
+                          set -e
+                          set -x
+
+                          # linux
+                          export GOOS=linux GOARCH=arm64
+                          go build -v -a -tags netgo -o release/linux/arm64/drone-gitea-release .
+                      when:
+                        stageStatus: Success
+                  - step:
+                      type: Plugin
+                      name: BuildAndPushDockerPlugin
+                      identifier: BuildAndPushDockerPlugin
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        image: plugins/docker
+                        settings:
+                          username: drone
+                          password: <+secrets.getValue("Plugins_Docker_Hub_Pat")>
+                          repo: plugins/gitea-release
+                          dockerfile: docker/Dockerfile.linux.arm64
+                          auto_tag: "true"
+                          auto_tag_suffix: linux-arm64
+                      when:
+                        stageStatus: Success
+                        condition: <+codebase.build.type> == "tag"
+                  - step:
+                      type: BuildAndPushDockerRegistry
+                      name: BuildAndPushDockerRegistry
+                      identifier: BuildAndPushDockerRegistry
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        repo: plugins/gitea-release
+                        tags:
+                          - linux-arm64
+                        caching: false
+                        dockerfile: docker/Dockerfile.linux.arm64
+                      when:
+                        stageStatus: Success
+                        condition: |
+                          <+codebase.build.type> == "branch"
+            description: ""
+        - stage:
+            name: windows-1809-amd64
+            identifier: windows1809amd64
+            type: CI
+            spec:
+              cloneCodebase: true
+              caching:
+                enabled: false
+                paths: []
+              execution:
+                steps:
+                  - step:
+                      name: Build binaries
+                      identifier: Build_binaries
+                      type: Run
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        image: golang:1.20
+                        shell: Sh
+                        command: |-
+                          # force go modules
+                          export GOPATH=""
+
+                          # disable cgo
+                          export CGO_ENABLED=0
+
+                          set -e
+                          set -x
+
+                          # Windows
+                          GOOS=windows
+                          go build -v -a -tags netgo -o release/windows/amd64/drone-gitea-release.exe .
+                      when:
+                        stageStatus: Success
+                  - step:
+                      type: Plugin
+                      name: BuildAndPushDockerPlugin
+                      identifier: BuildAndPushDockerPlugin
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        image: plugins/docker
+                        settings:
+                          username: drone
+                          password: <+secrets.getValue("Plugins_Docker_Hub_Pat")>
+                          repo: plugins/gitea-release
+                          dockerfile: docker/Dockerfile.windows.1809
+                          auto_tag: "true"
+                          auto_tag_suffix: windows-1809-amd64
+                      when:
+                        stageStatus: Success
+                        condition: <+codebase.build.type> == "tag"
+                  - step:
+                      type: BuildAndPushDockerRegistry
+                      name: BuildAndPushDockerRegistry
+                      identifier: BuildAndPushDockerRegistry
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        repo: plugins/gitea-release
+                        tags:
+                          - windows-1809-amd64
+                        caching: false
+                        dockerfile: docker/Dockerfile.windows.1809
+                      when:
+                        stageStatus: Success
+                        condition: |
+                          <+codebase.build.type> == "branch"
+              infrastructure:
+                type: VM
+                spec:
+                  type: Pool
+                  spec:
+                    poolName: windows-2019
+                    os: Windows
+            description: ""
+            delegateSelectors:
+              - windows-vm
+        - stage:
+            name: windows-ltsc2022-amd64
+            identifier: windowsltsc2022amd64
+            type: CI
+            spec:
+              cloneCodebase: true
+              caching:
+                enabled: false
+                paths: []
+              platform:
+                os: Windows
+                arch: Amd64
+              runtime:
+                type: Cloud
+                spec: {}
+              execution:
+                steps:
+                  - step:
+                      name: Build binaries
+                      identifier: Build_binaries
+                      type: Run
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        image: golang:1.20
+                        shell: Sh
+                        command: |-
+                          # force go modules
+                          export GOPATH=""
+
+                          # disable cgo
+                          export CGO_ENABLED=0
+
+                          set -e
+                          set -x
+
+                          # Windows
+                          GOOS=windows
+                          go build -v -a -tags netgo -o release/windows/amd64/drone-gitea-release.exe .
+                  - step:
+                      type: Plugin
+                      name: BuildAndPushDockerPlugin
+                      identifier: BuildAndPushDockerPlugin
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        image: plugins/docker
+                        settings:
+                          username: drone
+                          password: <+secrets.getValue("Plugins_Docker_Hub_Pat")>
+                          repo: plugins/gitea-release
+                          dockerfile: docker/Dockerfile.windows.ltsc2022
+                          auto_tag: "true"
+                          auto_tag_suffix: windows-ltsc2022-amd64
+                      when:
+                        stageStatus: Success
+                        condition: <+codebase.build.type> == "tag"
+                  - step:
+                      type: BuildAndPushDockerRegistry
+                      name: BuildAndPushDockerRegistry
+                      identifier: BuildAndPushDockerRegistry
+                      spec:
+                        connectorRef: Plugins_Docker_Hub_Connector
+                        repo: plugins/gitea-release
+                        tags:
+                          - windows-ltsc2022-amd64
+                        caching: false
+                        dockerfile: docker/Dockerfile.windows.ltsc2022
+                      when:
+                        stageStatus: Success
+                        condition: |
+                          <+codebase.build.type> == "branch"
+            description: ""
+    - stage:
+        name: Manifest
+        identifier: Manifest
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: false
+            paths: []
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Plugin
+                  name: Manifest
+                  identifier: Manifest
+                  spec:
+                    connectorRef: Plugins_Docker_Hub_Connector
+                    image: plugins/manifest
+                    settings:
+                      username: drone
+                      password: <+secrets.getValue("Plugins_Docker_Hub_Pat")>
+                      auto_tag: "true"
+                      ignore_missing: "true"
+                      spec: docker/manifest.tmpl
+                  when:
+                    stageStatus: Success
+                    condition: |
+                      <+codebase.build.type> == "tag" || <+codebase.build.type> == "branch"
+        description: ""
+  allowStageExecutions: true
