@@ -10,6 +10,7 @@ import (
 	"hash/crc32"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"golang.org/x/crypto/blake2b"
@@ -70,7 +71,7 @@ func writeChecksums(files, methods []string) ([]string, error) {
 				return nil, err
 			}
 
-			checksums[method] = append(checksums[method], hash, file)
+			checksums[method] = append(checksums[method], hash, filepath.Base(file))
 		}
 	}
 
