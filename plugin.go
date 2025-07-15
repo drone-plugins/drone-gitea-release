@@ -50,9 +50,10 @@ type (
 func (p Plugin) Exec() error {
 	var (
 		files []string
+		tag   = strings.TrimPrefix(p.Commit.Ref, "refs/tags/")
 	)
 
-	if p.Build.Event != "tag" {
+	if tag == "" {
 		return fmt.Errorf("The Gitea Release plugin is only available for tags")
 	}
 
@@ -128,7 +129,7 @@ func (p Plugin) Exec() error {
 		Client:     client,
 		Owner:      p.Repo.Owner,
 		Repo:       p.Repo.Name,
-		Tag:        strings.TrimPrefix(p.Commit.Ref, "refs/tags/"),
+		Tag:        tag,
 		Draft:      p.Config.Draft,
 		Prerelease: p.Config.PreRelease,
 		FileExists: p.Config.FileExists,
