@@ -3,10 +3,10 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/mattn/go-zglob"
 	"net/http"
 	"net/http/cookiejar"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
@@ -86,7 +86,7 @@ func (p Plugin) Exec() error {
 	}
 
 	for _, glob := range p.Config.Files {
-		globed, err := filepath.Glob(glob)
+		globed, err := zglob.Glob(glob)
 
 		if err != nil {
 			return fmt.Errorf("Failed to glob %s. %s", glob, err)
