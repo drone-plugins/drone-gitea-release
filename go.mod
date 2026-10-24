@@ -2,6 +2,8 @@ module github.com/drone-plugins/drone-gitea-release
 
 go 1.20
 
+toolchain go1.26.10
+
 require (
 	code.gitea.io/sdk/gitea v0.15.1
 	github.com/joho/godotenv v1.4.0
